@@ -1,0 +1,8 @@
+<h3>Products we have:</h3>
+
+@for (product of productList; track product) {
+    <a class="product-list-item" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.name}}</a>
+
+} @empty {
+    <div>Nothing found!</div>
+}   
