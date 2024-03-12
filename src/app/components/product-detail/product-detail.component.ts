@@ -1,7 +1,10 @@
-import { Component, OnInit, inject} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy, OnInit, computed, inject, signal} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductListServiceService, TProduct } from '../../services/product-list-service/product-list-service.service';
 import { CartServicesService } from '../../services/cart-services/cart-services.service';
+import { Subscription } from 'rxjs';
+
+
 @Component({
   selector: 'app-product-detail',
   standalone: true,
@@ -11,20 +14,36 @@ import { CartServicesService } from '../../services/cart-services/cart-services.
 })
 
 
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
     productListService = inject(ProductListServiceService);
     cartService = inject(CartServicesService);
     activatedRoute = inject(ActivatedRoute);
+    router = inject(Router);
     product: TProduct | undefined;
+    activeRouteSubscription: Subscription = new Subscription();
 
     id: string | null = "-1";
 
+    // counter = signal(0); 
+    // double = computed(() => {
+    //     return this.counter() * 2;
+    // })
+
+    onClickAddToCart() {
+        this.addToCart();
+    }
+
     ngOnInit(): void {
-        this.id = this.activatedRoute.snapshot.paramMap.get('id');
-        if (this.id) {
-            this.product = this.productListService.getProductById(this.id);
-            console.log(this.product?.name)
+        this.activeRouteSubscription = this.activatedRoute.params.subscribe((param) => {
+            if (param['id']) {
+                this.product = this.productListService.getProductById(param['id']);
+                console.log(this.product?.name)
         }
+        });
+    }
+
+    ngOnDestroy() {
+        this.activeRouteSubscription.unsubscribe();
     }
 
     addToCart() {

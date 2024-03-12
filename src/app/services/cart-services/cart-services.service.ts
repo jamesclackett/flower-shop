@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { ProductListServiceService, TProduct } from '../product-list-service/product-list-service.service';
 
-type TCartItem = {
+export type TCartItem = {
     quantity: number,
     product: TProduct
 }
 
-type TCartItemList = TCartItem[];
+export type TCartItemList = TCartItem[];
 
 
 @Injectable({
@@ -17,6 +17,11 @@ export class CartServicesService {
     cartItemList: TCartItemList = [];
 
   addProduct(product: TProduct) {
+    if (product.quantity < 1) {
+        console.log("cannot add to cart (no stock left)")
+        return;
+    }
+
     let found = false;
     this.cartItemList = this.cartItemList.map((cartItem) => {
         if(cartItem.product.id === product.id) {
@@ -31,12 +36,24 @@ export class CartServicesService {
         this.cartItemList.push({ product, quantity: 1 });
     }
     console.log("added to cart!")
-    // console.log("there are", )
+
+    const quantity = this.productListService.getProductById(product.id)?.quantity;
+
+    console.log("there are", quantity, "units left!");
   }
 
-  removeProduct(id: string) {
-    const index = this.cartItemList.findIndex((cartItem) => cartItem.product.id === id);
-    this.cartItemList.splice(index, 1);
+  decreaseProduct(product: TProduct) {
+    this.cartItemList = this.cartItemList.map((cartItem) => {
+        if(cartItem.product.id === product.id) {
+            cartItem.quantity--;
+            if (cartItem.quantity === 0) {
+                // code to remove from list
+            }
+
+            this.productListService.increaseQuantity(cartItem.product.id);
+        }
+        return cartItem;
+    });
   }
 
   listCartItems(): TCartItemList{

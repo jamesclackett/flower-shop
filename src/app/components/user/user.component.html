@@ -1,0 +1,16 @@
+<h3>User:</h3>
+<div>username: {{ user ? user.username : undefined }}</div>
+<div>email: {{ user ? user.email : undefined }}</div>
+
+@if (user) {
+    @for (address of user.addressList; track address) {
+        <div>{{ address }}</div>
+        <!-- <button (click)="onClickEditAddress()">Edit Address</button> -->
+    } @empty {
+        <div>No address on file</div>
+    }
+}
+<form action=""></form>
+<button>Add new Address</button>
+
+  

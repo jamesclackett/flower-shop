@@ -47,7 +47,18 @@ export class ProductListServiceService {
   decreaseQuantity(id: string) {
     this.productList= this.productList.map((product) => {
         if(product.id === id) {
-            product.quantity--;
+            if (product.quantity > 0)
+                product.quantity--;
+            else console.log("No more stock left (cannot decrease)")
+        }
+        return product;
+    });
+  }
+
+  increaseQuantity(id: string) {
+    this.productList= this.productList.map((product) => {
+        if(product.id === id) {
+            product.quantity++;
         }
         return product;
     });

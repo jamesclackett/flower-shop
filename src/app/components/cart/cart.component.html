@@ -1,0 +1,16 @@
+<h3>Your Cart:</h3>
+
+@for(cartItem of cartItemList; track cartItem) {
+    <div>Item:</div>
+    <div>
+        <div>{{cartItem.product.name}}</div>
+        <div>{{cartItem.quantity}}</div>
+        <div class="edit-cart">
+            <button (click)="onClickIncreaseQuantity(cartItem)" class="edit-btn">+</button>
+            <button (click)="onClickDecreaseQuantity(cartItem)" class="edit-btn">-</button>
+        </div>
+        <div>--------</div>
+    </div>
+} @empty {
+    <div>Your cart is empty!</div>
+}
