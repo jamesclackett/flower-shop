@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal} from '@angular/core';
+import { Component, OnDestroy, OnInit, inject} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductListServiceService, TProduct } from '../../services/product-list-service/product-list-service.service';
 import { CartServicesService } from '../../services/cart-services/cart-services.service';
@@ -24,11 +24,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
     id: string | null = "-1";
 
-    // counter = signal(0); 
-    // double = computed(() => {
-    //     return this.counter() * 2;
-    // })
-
     onClickAddToCart() {
         this.addToCart();
     }
@@ -52,7 +47,4 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
         }
     }
    
-    // @Input() id!: number
-
-
 }

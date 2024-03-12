@@ -1,7 +1,13 @@
 <h3>Login:</h3>
 
+<form class="user-login-form" (ngSubmit)="onClickLogin()">
+    <input type="text" name="username" placeholder="Enter a username" [(ngModel)]="userName">
+    <input type="password" name="password" placeholder="Enter a password" [(ngModel)]="userPass">
+    <button type="submit">Login</button>
+</form>
+
 <a class="f1-header__2__menu" 
-    routerLink="registration" 
+    routerLink="/user-registration" 
     routerLinkActive="active"
     ariaCurrentWhenActive="page">
     Or Register

@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export type TProduct = {
     id: string,
@@ -15,6 +17,12 @@ export type TProductList = TProduct[]
 })
 
 export class ProductListServiceService {
+    httpClient: HttpClient = inject(HttpClient);
+
+    productList$ = this.httpClient.get<TProductList>('http://localhost:8000/product-list');
+    productListSignal = toSignal(this.productList$);
+
+
     productList: TProductList = [
         {   id: '1',
             name:  'yellow',

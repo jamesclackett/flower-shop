@@ -1,0 +1,19 @@
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 50%;
+}
+.user-info-address {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.address-form {
+    display: flex;
+}
+
+.add-address-btn {
+    width: 25%
+}

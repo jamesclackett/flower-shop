@@ -1,16 +1,30 @@
 <h3>User:</h3>
-<div>username: {{ user ? user.username : undefined }}</div>
-<div>email: {{ user ? user.email : undefined }}</div>
 
-@if (user) {
-    @for (address of user.addressList; track address) {
-        <div>{{ address }}</div>
-        <!-- <button (click)="onClickEditAddress()">Edit Address</button> -->
-    } @empty {
-        <div>No address on file</div>
+<div class="user-info">
+    <div>username: {{ user ? user.username : undefined }}</div>
+    <div>email: {{ user ? user.email : undefined }}</div>
+
+    @if (user) {
+        @for (address of user.addressList; track address; let index = $index) {
+            <div class="user-info-address">
+                <div class="address-text">{{ address }}</div>
+                <form class="address-form" 
+                (ngSubmit)="onClickSaveAddress(index, editAddressInput.value); editAddressInput.value=''">
+                    <input type="text" #editAddressInput name="edit-address" placeholder="Edit Address">
+                    <button type="submit">Edit</button>
+                </form>
+                <button (click)="onClickDeleteAddress(index)">Delete</button>
+            </div>
+        } @empty {
+            <div>No address on file</div>
+        }
     }
-}
-<form action=""></form>
-<button>Add new Address</button>
 
+    <form class="address-form" 
+        (ngSubmit)="onClickAddNewAddress(newAddressInput.value); newAddressInput.value = ''">
+        <input type="text" #newAddressInput name="new-address" placeholder="Add New Address">
+        <button type="submit">Add</button>
+    </form>
+
+</div>
   
