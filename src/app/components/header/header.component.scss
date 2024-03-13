@@ -1,12 +1,30 @@
-.fl-header {
+.header {
+    justify-content: space-between;
     display: flex;
-    justify-content: space-around;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 20px;
 }
-.fl-header__1 {
-    display: flex;
-    gap: 1rem;
+
+.header-title {
+    font-weight: bolder;
+    font-size: large;
 }
-.fl-header__2 {
+
+.header-content {
+    width: 100%;
     display: flex;
-    gap: 1rem;
+    justify-content: space-between;
+}
+
+.header-nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+ 
+.header-user {
+   display: flex;
+   gap: 15px;
+   flex-wrap: wrap;
 }

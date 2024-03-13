@@ -9,7 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
   standalone: true,
   imports: [RouterOutlet, HeaderComponent, ProductListComponent, HttpClientModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.sass'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'flower-shop';

@@ -1,8 +1,20 @@
-<h3>Products we have:</h3>
+<div class="products-content">
 
-@for (product of productListService.productListSignal(); track product) {
-    <a class="product-list-item" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.name}}</a>
-
-} @empty {
-    <div>Nothing found!</div>
-}   
+    <div class="product-list">
+        <div class="product-list-title">Flowers in stock:</div>
+        <div class="product-list-content">
+            @for (product of productListService.productListSignal(); track product) {
+                <div class="product-list-item">
+                    <img class="list-item-image" src="{{ product.imageUrl }}" alt="flower image" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">
+                    <a class="list-item-title" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.name}}</a>
+                </div>
+                
+    
+            } @empty {
+                <div>Nothing found!</div>
+            }
+        </div>
+         
+    </div>
+    
+</div>

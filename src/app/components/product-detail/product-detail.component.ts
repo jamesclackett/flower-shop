@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [],
   templateUrl: './product-detail.component.html',
-  styleUrl: './product-detail.component.sass'
+  styleUrl: './product-detail.component.scss'
 })
 
 

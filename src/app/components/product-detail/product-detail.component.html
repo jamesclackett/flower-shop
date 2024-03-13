@@ -1,9 +1,19 @@
-<h2>Product Details:</h2>
-<h3>Product name: {{ product ? product.name : undefined }}</h3>
-<h3>Description: {{ product ? product.desc : undefined }}</h3>
-<h3>Price: €{{ product ? product.price : undefined }}</h3>
-<h3>Stock remaining: {{ product ? product.quantity : undefined }}</h3>
-<button (click)="onClickAddToCart()">add to cart</button>
-<!-- <div>{{counter()}}</div>
-<div>{{double()}}</div> -->
+<div class="product-detail-content">
+
+    @if (product) {
+        <div class="product-detail-image-container">
+            <img class="product-detail-image" src="{{ product.imageUrl }}" alt="">
+        </div>
+    
+        <div class="product-detail-info">
+            <div class="product-detail-title">{{ product.name}}</div>
+            <div class="product-detail-price">{{ 'Price: €' + product.price}}</div>
+            <div class="product-detail-desc">{{ product.desc }}</div>
+            <div class="product-detail-stock">{{'Stock remaining: ' + product.quantity}}</div>
+            <button class="product-detail-add" (click)="onClickAddToCart()">Add to cart</button>
+        </div>
+    } @else {
+        <div class="product-detail-empty">No More Information</div>
+    }
+</div>
 
