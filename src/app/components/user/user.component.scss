@@ -1,19 +1,64 @@
-.user-info {
+.user-info-content {
+    display: flex;
+    justify-content: center;
+}   
+
+input, button {
+    font-size: 1.1rem;
+}
+
+
+.user-info-title {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+.user-info-details {
+    width: 700px;
+    border: 3px solid lightgray;
+    border-radius: 25px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 50%;
-}
-.user-info-address {
-    display: flex;
-    gap: 10px;
     align-items: center;
+    gap: 20px;
 }
-
-.address-form {
+.details-username {
+    text-align: center;
+}
+.details-email {
+    text-align: center;
+}
+.title {
+    font-size: 1.2rem;
+    text-align: center;
+}
+.details-address-list {
+    margin-top: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 500px;
+}
+.address-list-item-text {
+    font-size: 1.2rem;
+    font-weight: bold   ;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.address-list-item-edit {
     display: flex;
 }
 
-.add-address-btn {
-    width: 25%
+.edit-form-input {
+    width: 250px;
 }
+.details-new-address-form{
+    margin-top: 60px;
+}
+
+.add-form-input {
+    width: 320px;
+}
+

@@ -1,16 +1,29 @@
-<h3>Your Cart:</h3>
-
-@for(cartItem of cartItemList; track cartItem) {
-    <div>Item:</div>
-    <div>
-        <div>{{cartItem.product.name}}</div>
-        <div>{{cartItem.quantity}}</div>
-        <div class="edit-cart">
-            <button (click)="onClickIncreaseQuantity(cartItem)" class="edit-btn">+</button>
-            <button (click)="onClickDecreaseQuantity(cartItem)" class="edit-btn">-</button>
-        </div>
-        <div>--------</div>
+<div class="cart-contents">
+    <div class="cart-title">Shopping Cart:</div>
+    <div class="cart-list">
+        @for(cartItem of cartItemList; track cartItem) {
+            <div class="cart-list-item">
+                <div class="cart-list-item-image">
+                    <img class="item-info-image" src="{{cartItem.product.imageUrl}}">
+                </div>
+                <div class="cart-list-item-info">
+                    <div class="item-info-meta">
+                        <div class="item-info-title">{{cartItem.product.name}}</div>
+                        <div class="item-info-price">€{{cartItem.product.price}}</div>
+                        <div class="item-info-quantity">quantity: {{cartItem.quantity}}</div>
+                    </div>
+                    <div class="item-info-edit">
+                        <button class="info-edit-increase" (click)="onClickIncreaseQuantity(cartItem)">+</button>
+                        <button class="info-edit-decrease" (click)="onClickDecreaseQuantity(cartItem)">-</button>
+                        <button class="info-edit-delete" (click)="onClickDeleteCartItem(cartItem)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        } @empty {
+            <div class="cart-empty-title">Your cart is empty!</div>
+        }
     </div>
-} @empty {
-    <div>Your cart is empty!</div>
-}
+    @if (cartItemList.length > 0) {
+        <div class="cart-total-price">Total: €{{ totalPrice }}</div>
+    }
+</div>

@@ -1,30 +1,46 @@
-<h3>User:</h3>
+<div class="user-info-title">Your Profile:</div>
 
-<div class="user-info">
-    <div>username: {{ user ? user.username : undefined }}</div>
-    <div>email: {{ user ? user.email : undefined }}</div>
+<div class="user-info-content">
 
     @if (user) {
-        @for (address of user.addressList; track address; let index = $index) {
-            <div class="user-info-address">
-                <div class="address-text">{{ address }}</div>
-                <form class="address-form" 
-                (ngSubmit)="onClickSaveAddress(index, editAddressInput.value); editAddressInput.value=''">
-                    <input type="text" #editAddressInput name="edit-address" placeholder="Edit Address">
-                    <button type="submit">Edit</button>
-                </form>
-                <button (click)="onClickDeleteAddress(index)">Delete</button>
+        <div class="user-info-details">
+            <div class="details-username">
+                <div class="username-title title">Username:</div>
+                <div class="username-value">{{user.username}}</div>
             </div>
-        } @empty {
-            <div>No address on file</div>
-        }
-    }
 
-    <form class="address-form" 
-        (ngSubmit)="onClickAddNewAddress(newAddressInput.value); newAddressInput.value = ''">
-        <input type="text" #newAddressInput name="new-address" placeholder="Add New Address">
-        <button type="submit">Add</button>
-    </form>
+            <div class="details-email">
+                <div class="email-title title">Email:</div>
+                <div class="email-value">{{ user.email }}</div>
+            </div>
+
+            <div class="details-address-list">
+                <div class="address-list-title title">Address List:</div> 
+                @for (address of user.addressList; track address; let index = $index) {
+                    <div class="address-list-item">
+                        <div class="address-list-item-text">{{ address }}</div>
+                        <div class="address-list-item-edit">
+                            <form class="address-edit-form" 
+                                (ngSubmit)="onClickSaveAddress(index, editAddressInput.value); editAddressInput.value=''">
+                                <input class="edit-form-input" type="text" #editAddressInput name="edit-address" placeholder="Edit Address">
+                                <button type="submit">Edit</button>
+                            </form>
+                            <button (click)="onClickDeleteAddress(index)">Delete</button>
+                        </div>
+                    </div>
+                } @empty {
+                    <div>No address on file</div>
+                }
+            </div>
+            <form class="details-new-address-form" 
+                (ngSubmit)="onClickAddNewAddress(newAddressInput.value); newAddressInput.value = ''">
+                <input class="add-form-input" type="text" #newAddressInput name="new-address" placeholder="Add New Address">
+                <button type="submit">Add</button>
+            </form>
+        </div>
+    } @else {
+        <div class="user-info-empty">Sorry, couldn't find anything</div>
+    }
 
 </div>
   

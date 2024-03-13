@@ -36,9 +36,7 @@ export class CartServicesService {
         this.cartItemList.push({ product, quantity: 1 });
     }
     console.log("added to cart!")
-
     const quantity = this.productListService.getProductById(product.id)?.quantity;
-
     console.log("there are", quantity, "units left!");
   }
 
@@ -47,9 +45,8 @@ export class CartServicesService {
         if(cartItem.product.id === product.id) {
             cartItem.quantity--;
             if (cartItem.quantity === 0) {
-                // code to remove from list
+                //this.deleteItem(cartItem);
             }
-
             this.productListService.increaseQuantity(cartItem.product.id);
         }
         return cartItem;
@@ -58,5 +55,19 @@ export class CartServicesService {
 
   listCartItems(): TCartItemList{
     return this.cartItemList;
+  }
+
+  computeTotalPrice(): number {
+    let total: number = 0;
+    for (let cartItem of this.cartItemList) {
+        const cost = cartItem.product.price * cartItem.quantity;
+        total += cost;
+    } 
+    return total;
+  }
+
+  deleteItem(cartItem: TCartItem): void {
+    let index: number = this.cartItemList.findIndex((item) => item == cartItem)
+    this.cartItemList.splice(index, 1);
   }
 }

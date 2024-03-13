@@ -1,8 +1,40 @@
-.edit-cart {
-    display: flex;
-    gap: 20px;
+.cart-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 40px;
 }
-.edit-btn {
-    height: 30px;
-    width: 30px;
+.cart-list {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 500px;
+}
+
+.cart-list-item {
+    display: flex;
+    border: 3px solid #eee;
+    border-radius: 20px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-list-item-info {
+    margin: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-info-image {
+    margin-left: 5px;
+    margin-top: 5px;
+    height: 100px;
+    border-radius: 10px;
+    border: 2px solid lightgrey;
+}
+
+.cart-total-price {
+    font-size: 1.5rem;
+    padding: 20px;
 }
