@@ -4,14 +4,14 @@ const getUser = async (req, res) => {
     const userId = req.params.userId;
     console.log('info requested for user', userId);
     const result = await queryDatabase(`SELECT * FROM "user" WHERE id ='${userId}'`);
-    res.send(result.rows);
+    res.status(200).send(result.rows);
 }
 
 const getUserByUsername = async (req, res) => {
     const username = req.params.username;
     console.log('info requested for user', username);
     const result = await queryDatabase(`SELECT * FROM "user" WHERE username ='${username}'`);
-    res.send(result.rows);
+    res.status(200).send(result.rows[0]);
 }
 
 const postUser = async (req, res) => {
