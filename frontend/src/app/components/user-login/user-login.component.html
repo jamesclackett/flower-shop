@@ -1,0 +1,17 @@
+<div class="user-login-content">
+    <div class="user-login-title">Log in to your account:</div>
+
+    <form class="user-login-form" (ngSubmit)="onClickLogin()">
+        <input class="login-form-input" type="text" name="username" placeholder="Enter a username" [(ngModel)]="userForm.username">
+        <input class="login-form-input" type="password" name="password" placeholder="Enter a password" [(ngModel)]="userForm.password">
+        <button type="submit">Login</button>
+    </form>
+
+    <a class="user-login-register" 
+    routerLink="/user-registration" 
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page">
+    Or Register Here
+</a>
+</div>
+

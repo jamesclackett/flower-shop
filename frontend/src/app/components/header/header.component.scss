@@ -1,0 +1,30 @@
+.header {
+    justify-content: space-between;
+    display: flex;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 20px;
+}
+
+.header-title {
+    font-weight: bolder;
+    font-size: large;
+}
+
+.header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+ 
+.header-user {
+   display: flex;
+   gap: 15px;
+   flex-wrap: wrap;
+}

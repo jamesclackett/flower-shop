@@ -1,0 +1,63 @@
+<div class="user-info-title">Your Profile:</div>
+
+<div class="user-info-content">
+
+    @for (user of user(); track user) {
+        <div class="user-info-details">
+            <div class="details-username">
+                <div class="username-title title">Username:</div>
+                <div class="username-value">{{user.username}}</div>
+            </div>
+
+            <div class="details-email">
+                <div class="email-title title">Email:</div>
+                <div class="email-value">{{ user.email }}</div>
+            </div>
+
+            <div class="details-address-list">
+                <div class="address-list-title title">Address List:</div> 
+                
+                @for (address of user.address_list; track address; let index = $index) {
+                    <div class="address-list-item">
+                        <div class="address-list-item-text">{{ address }}</div>
+                        <div class="address-list-item-edit">
+                            <form class="address-edit-form" 
+                                (ngSubmit)="onClickEditAddress(index, editAddressInput.value); editAddressInput.value=''">
+                                <input class="edit-form-input" type="text" #editAddressInput name="edit-address" placeholder="Edit Address">
+                                <button type="submit">Edit</button>
+                            </form>
+                            <button (click)="onClickDeleteAddress(index)">Delete</button>
+                        </div>
+                    </div>
+                } @empty {
+                    <div>No address on file</div>
+                }
+            </div>
+            <form class="details-new-address-form" 
+                (ngSubmit)="onClickAddAddress(newAddressInput.value); newAddressInput.value = ''">
+                <input class="add-form-input" type="text" #newAddressInput name="new-address" placeholder="Add New Address">
+                <button type="submit">Add</button>
+            </form>
+            <button (click)="onClickLogout()">LOGOUT</button> 
+        </div>
+
+    }
+    @empty {
+        <div class="redirect">
+
+            <a  routerLink="/user-login" 
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page">
+                Login
+            </a>
+            <a  routerLink="/user-registration" 
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page">
+                Or Register
+            </a>
+
+        </div>
+    }
+
+</div>
+  

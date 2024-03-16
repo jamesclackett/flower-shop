@@ -1,0 +1,15 @@
+<div class="user-register-content">
+
+    <div class="user-register-title">Sign Up for Flower Shop</div>
+
+    <form class="user-register-form" (ngSubmit)="onClickSubmit()">
+        <input type="text" name="username" placeholder="Enter a username" [(ngModel)]="userForm.username">
+        <input type="email" name="email" placeholder="Enter your email" [(ngModel)]="userForm.email">
+        <input type="password" name="password" placeholder="Enter a password" [(ngModel)]="userForm.password">
+        <input type="text" name="address" placeholder="Address" [(ngModel)]="userForm.address">
+        <button type="submit">Create Account</button>
+    </form>
+    
+</div>
+
+

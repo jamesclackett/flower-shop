@@ -1,0 +1,39 @@
+<div class="cart-contents">
+    <div class="cart-title">Shopping Cart:</div>
+    <div class="cart-list">
+        @for(cartItem of cartItems(); track cartItem) {
+            <div class="cart-list-item">
+                <div class="cart-list-item-image">
+                    <img class="item-info-image" src="{{ imageURL + cartItem.img_src}}">
+                </div>
+                <div class="cart-list-item-info">
+                    @if (cartItem.product_name) {
+                    
+                        <div class="item-info-meta">
+                            <div class="item-info-title">{{cartItem.product_name}}</div>
+                            <div class="item-info-price">€{{cartItem.price}}</div>
+                            <div class="item-info-quantity">quantity: {{cartItem.quantity}}</div>
+                        </div>
+                        <div class="item-info-edit">
+                            <button class="info-edit-increase" (click)="onClickIncreaseItemQuantity(cartItem)">+</button>
+                            <button class="info-edit-decrease" (click)="onClickDecreaseItemQuantity(cartItem)">-</button>
+                            <button class="info-edit-delete" (click)="onClickDeleteItem(cartItem)">Delete</button>
+                        </div>
+                    
+                } @else {
+                    <div class="item-info-meta">
+                        <div class="item-info-title">It appears this item sold out</div>
+                    </div>
+                }
+                </div>
+                
+                
+            </div>
+        } @empty {
+            <div class="cart-empty-title">Your cart is empty!</div>
+        }
+    </div>
+    @if(cartItems()) {
+        <div class="cart-total-price">Total: €{{getTotalPrice()}}</div>
+    }   
+</div>
