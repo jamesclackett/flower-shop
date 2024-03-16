@@ -25,7 +25,7 @@ export class ProductListServiceService {
     private httpClient: HttpClient = inject(HttpClient);
 
     product$ = toObservable(this.productId).pipe(
-        switchMap(productId => this.httpClient.get<TProduct[]>(API_URL_PRODUCT + productId)))
+        switchMap(productId => this.httpClient.get<TProduct>(API_URL_PRODUCT + productId)))
     product = toSignal(this.product$);
     // ASK XIN WHY THIS WORKS 
 

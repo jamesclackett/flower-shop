@@ -1,17 +1,17 @@
 <div class="product-detail-content">
 
-    @for (product of product(); track product) {
+    @if (product()) {
         <div class="product-detail-image-container">
-            <img class="product-detail-image" src="{{ imageURL + product.img_src }}" alt="">
+            <img class="product-detail-image" src="{{ imageURL + product()?.img_src }}" alt="">
         </div>
         <div class="product-detail-info">
-            <div class="product-detail-title">{{ product.product_name}}</div>
-            <div class="product-detail-price">{{ 'Price: €' + product.price}}</div>
-            <div class="product-detail-desc">{{ product.description }}</div>
-            <div class="product-detail-stock">{{'Stock remaining: ' + product.stock_remaining}}</div>
+            <div class="product-detail-title">{{ product()?.product_name}}</div>
+            <div class="product-detail-price">{{ 'Price: €' + product()?.price}}</div>
+            <div class="product-detail-desc">{{ product()?.description }}</div>
+            <div class="product-detail-stock">{{'Stock remaining: ' + product()?.stock_remaining}}</div>
             <button class="product-detail-add" (click)="onClickAddToCart()">Add to cart</button>
         </div>
-    } @empty {
+    } @else {
         <div class="product-detail-empty">No information</div>
     }
     

@@ -43,7 +43,7 @@ export class ProductDetailComponent implements OnInit {
     private addToCart() {
         let product = this.product();
         if (product) {
-            this.cartService.addProductToCart(product[0]);
+            this.cartService.addProductToCart(product);
         }
     }
    

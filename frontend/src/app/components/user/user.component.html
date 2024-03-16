@@ -2,22 +2,22 @@
 
 <div class="user-info-content">
 
-    @for (user of user(); track user) {
+    @if (user()) {
         <div class="user-info-details">
             <div class="details-username">
                 <div class="username-title title">Username:</div>
-                <div class="username-value">{{user.username}}</div>
+                <div class="username-value">{{user()?.username}}</div>
             </div>
 
             <div class="details-email">
                 <div class="email-title title">Email:</div>
-                <div class="email-value">{{ user.email }}</div>
+                <div class="email-value">{{ user()?.email }}</div>
             </div>
 
             <div class="details-address-list">
                 <div class="address-list-title title">Address List:</div> 
                 
-                @for (address of user.address_list; track address; let index = $index) {
+                @for (address of user()?.address_list; track address; let index = $index) {
                     <div class="address-list-item">
                         <div class="address-list-item-text">{{ address }}</div>
                         <div class="address-list-item-edit">
@@ -42,7 +42,7 @@
         </div>
 
     }
-    @empty {
+    @else {
         <div class="redirect">
 
             <a  routerLink="/user-login" 

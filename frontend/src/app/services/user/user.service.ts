@@ -18,13 +18,13 @@ export type TUser = {
 })
 export class UserService implements OnDestroy{
     private httpClient = inject(HttpClient);
-    user = signal<TUser[] | undefined> (undefined);
+    user = signal<TUser | undefined> (undefined);
     user$ = toObservable(this.user);
     apiSubscription = new Subscription;
 
     getUserId(): number | undefined{
         let user = this.user();
-        return user ? user[0].id : undefined;
+        return user ? user.id : undefined;
     }
 
     isLoggedIn() : boolean {
@@ -35,7 +35,7 @@ export class UserService implements OnDestroy{
     loginUser(username: string, password: string) {
         this.apiSubscription = this.findUser(username).pipe(take(1)).subscribe(
             (user) => {
-                if (user && user[0].password === password) {
+                if (user && user.password === password) {
                     this.user.set(user);
                 }
             }
@@ -48,32 +48,32 @@ export class UserService implements OnDestroy{
         return user === undefined ? true : false;
     }
 
-    findUser(username: string): Observable<TUser[]> {
-        return this.httpClient.get<TUser[]>(API_URL_USER + username);
+    findUser(username: string): Observable<TUser> {
+        return this.httpClient.get<TUser>(API_URL_USER + username);
     }
 
     editUserAddress(addressIndex: number, address: string) {
         let user = this.user();
         if (user) {
-            user[0].address_list[addressIndex] = address;
-            this.updateUser(user[0]);
+            user.address_list[addressIndex] = address;
+            this.updateUser(user);
         }   
     }
     
     addUserAddress(address: string) {
         let user = this.user();
         if (user) {
-            user[0].address_list.push(address);
-            this.updateUser(user[0]);
+            user.address_list.push(address);
+            this.updateUser(user);
         }
     }
 
     deleteUserAddress(addressIndex: number) {
         let user = this.user();
         if (user) {
-            if (user[0].address_list.length > 1) {
-                user[0].address_list.splice(addressIndex, 1);
-                this.updateUser(user[0]);
+            if (user.address_list.length > 1) {
+                user.address_list.splice(addressIndex, 1);
+                this.updateUser(user);
             } else {
                 console.log("cannot remove users only address");
             }
@@ -84,7 +84,7 @@ export class UserService implements OnDestroy{
     updateUser(user: TUser) {
         const URL = `${API_URL_USER}${user.id}`
             this.apiSubscription = this.httpClient.patch(URL, {"user" : user}).pipe(take(1)).subscribe(
-                () => {this.user.set([user])}
+                () => {this.user.set(user)}
             )
     }
 
