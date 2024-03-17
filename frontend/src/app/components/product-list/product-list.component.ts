@@ -17,4 +17,5 @@ export class ProductListComponent {
     private productListService = inject(ProductListServiceService);
     productList = this.productListService.productList;
     imageURL = API_URL_IMAGE;
+    dummyArray = [0,0,0,0];
 }

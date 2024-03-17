@@ -29,6 +29,7 @@ export class ProductDetailComponent implements OnInit {
     ngOnInit(): void { 
         this.productListService.setProductId(this.id); 
         this.cartService.getCartItems();
+        this.cartService.getCartId();
     }
 
     onClickAddToCart() { 

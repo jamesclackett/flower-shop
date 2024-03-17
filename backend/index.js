@@ -26,6 +26,7 @@ app.patch('/user/:userId', userService.patchUser);
 
 //// Cart API:
 app.get('/user/:userId/cart', cartService.getCartItems);
+app.get('/user/:userId/cart/info', cartService.getCartInfo)
 app.post('/user/:userId/cart/:cartId', cartService.postCartItem)
 app.patch('/user/:userId/cart/:cartId/:itemId', cartService.patchCartItem)
 app.delete('/user/:userId/cart/:cartId/:itemId', cartService.deleteCartItem)

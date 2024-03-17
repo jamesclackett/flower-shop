@@ -16,6 +16,7 @@ export class CartComponent  implements OnInit {
 
     ngOnInit(): void {
         this.cartService.getCartItems();
+        this.cartService.getCartId();
     }
 
     onClickIncreaseItemQuantity(cartItem: TCartItem): void {

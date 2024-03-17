@@ -24,12 +24,33 @@ const getCartItems = async (req, res) => {
     }
 }
 
+const getCartInfo = async (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        res.status(400).send();
+        return;
+    } 
+
+    const cartInfo = {
+        id: await getCartByUserId(userId)
+    }
+    
+    if (!cartInfo) {
+        res.status(400).send();
+        return;
+    } else {
+        res.status(200).send(cartInfo);
+    }
+
+}
+
 const getCartByUserId = async (userId) => {
     if (!userId) {
         return;
     }
     console.log('cart requested for user', userId);
-    const result = await queryDatabase(`SELECT * FROM "cart" WHERE user_id ='${userId}'`);
+    const result = await queryDatabase(`SELECT * FROM "cart" WHERE user_id =${userId}`);
     if (result.rows.length > 0) {
         return result.rows[0].id;
     }
@@ -92,4 +113,4 @@ const patchCartItem = async (req, res) => {
 
 
 
-module.exports = {getCartItems, postCartItem, patchCartItem, deleteCartItem};
+module.exports = {getCartItems, getCartInfo, postCartItem, patchCartItem, deleteCartItem};

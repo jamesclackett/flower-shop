@@ -4,14 +4,16 @@
         <div class="product-list-title">Current Product List:</div>
         <div class="product-list-content">
 
-            @for (product of productList(); track product) {
-                <div class="product-list-item">
-                    <img class="list-item-image" src="{{imageURL +  product.img_src }}" 
-                    alt="flower image" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">
-                    <a class="list-item-title" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.product_name}}</a>
-                </div>
-            } @empty {
-                <div>Nothing found!</div>
+            @for (i of dummyArray; track i) {
+                @for (product of productList(); track product) {
+                    <div class="product-list-item">
+                        <img class="list-item-image" src="{{imageURL +  product.img_src }}" 
+                        alt="flower image" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">
+                        <a class="list-item-title" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.product_name}}</a>
+                    </div>
+                } @empty {
+                    <div>Nothing found!</div>
+                }
             }
         </div>
          

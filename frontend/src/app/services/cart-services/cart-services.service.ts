@@ -15,8 +15,11 @@ export type TCartItem = {
     price: number,
     stock_remaining: number,
     img_src: string,
-    created_at: number
-    
+    created_at: number   
+}
+
+type TCartInfo = {
+    id: number
 }
 
 export type TCartItemList = TCartItem[];
@@ -38,28 +41,33 @@ export class CartServicesService implements OnDestroy {
     }
 
     addProductToCart(product: TProduct) {
-        let cartItems = this.cartItems();
+        if (this.cartId) {
 
-        if (cartItems && this.cartId) {
-            let found = cartItems.find(item => item.product_id === product.id);
+            const cartItem: TCartItem = {
+                id:  -1, 
+                cart_id :  this.cartId, 
+                product_id : product.id,
+                quantity : 1,
+                product_name : product.product_name,
+                description : product.description,
+                price : product.price,
+                stock_remaining : product.stock_remaining,
+                img_src : product.img_src,
+                created_at: Date.now() / 1000
+            };
+            
+            let cartItems = this.cartItems();
 
-            if (!found) {
+            if (cartItems) {
+                let found = cartItems.find(item => item.product_id === product.id);
 
-                const cartItem: TCartItem = {
-                    id:  -1, 
-                    cart_id :  this.cartId, 
-                    product_id : product.id,
-                    quantity : 1,
-                    product_name : product.product_name,
-                    description : product.description,
-                    price : product.price,
-                    stock_remaining : product.stock_remaining,
-                    img_src : product.img_src,
-                    created_at: Date.now() / 1000
-                };
-                this.postCartItem(cartItem);
+                if (!found) {
+                    this.postCartItem(cartItem);
+                } else {
+                    this.increaseItemQuantity(found);
+                }
             } else {
-                this.increaseItemQuantity(found);
+                this.postCartItem(cartItem);
             }
         }
     }
@@ -95,9 +103,21 @@ export class CartServicesService implements OnDestroy {
         if(this.userService.isLoggedIn()) {
             const URL =
              `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}`
-             
             this.apiSubscription =  this.httpClient.post<TCartItemList>(URL, {"cartItem" : cartItem}).pipe(take(1)).subscribe(
                 () => {this.getCartItems()}
+            )
+        }
+    }
+
+    getCartId() {
+        if (this.userService.isLoggedIn()) {
+            const URL = `${API_URL_USER}${this.userService.getUserId()}/cart/info`;
+            this.apiSubscription = this.httpClient.get<TCartInfo>(URL).pipe(take(1)).subscribe(
+                (cartInfo) => {
+                    if (cartInfo) {
+                        this.cartId = cartInfo.id;
+                    }
+                }
             )
         }
     }
@@ -107,8 +127,9 @@ export class CartServicesService implements OnDestroy {
             const URL = `${API_URL_USER}${this.userService.getUserId()}/cart`;
             this.apiSubscription =  this.httpClient.get<TCartItemList>(URL).pipe(take(1)).subscribe(
                 (cartItems) => { 
-                    this.cartItems.set(cartItems);
-                    if (cartItems) this.cartId = cartItems[0].cart_id;
+                    if (cartItems.length > 0) {
+                        this.cartItems.set(cartItems);
+                    } else this.cartItems.set(undefined);
                 }
             )
         }
@@ -116,6 +137,7 @@ export class CartServicesService implements OnDestroy {
 
     deleteItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
+            console.log("hello")
             const URL =
              `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}/${cartItem.id}`
              
