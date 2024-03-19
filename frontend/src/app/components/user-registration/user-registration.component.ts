@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { TUserRegisterForm, UserRegistrationService } from '../../services/user-registration/user-registration.service';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TUserRegisterForm, UserService } from '../../services/user/user.service';
 
 @Component({
   selector: 'app-user-registration',
@@ -12,21 +12,14 @@ import { Router } from '@angular/router';
 })
 export class UserRegistrationComponent {
     router: Router = inject(Router);
-    userRegistrationService = inject(UserRegistrationService);
+    userService: UserService = inject(UserService);
     userForm: TUserRegisterForm = {username: '', password: '', email: '', address: ''};
 
-    onClickSubmit() {
+    onClickSubmit(): void {
         this.registerUser(this.userForm);
-
-        // if (success) {
-        //     this.router.navigate(['user-login']);
-        // }
-        // else {
-        //     console.log("issue registering. try again.")
-        // }
     }
 
-    registerUser(form: TUserRegisterForm) {
-        this.userRegistrationService.registerUser(form);
+    registerUser(form: TUserRegisterForm): void {
+        this.userService.registerUser(form);
     }
 }

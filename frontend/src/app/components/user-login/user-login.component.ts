@@ -3,7 +3,6 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserService } from '../../services/user/user.service';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-user-login',
@@ -15,11 +14,11 @@ import { toObservable } from '@angular/core/rxjs-interop';
 
 export class UserLoginComponent implements OnInit, OnDestroy {
     router: Router = inject(Router);
-    userService = inject(UserService);
+    userService: UserService = inject(UserService);
     userForm = {username: '', password: ''};
-    loginSubscription = new Subscription;
+    loginSubscription: Subscription = new Subscription;
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.loginSubscription = this.userService.user$.subscribe(
             () => {if (this.userService.isLoggedIn()) {
                 this.router.navigate(['/user/', this.userService.getUserId()]);
@@ -30,11 +29,11 @@ export class UserLoginComponent implements OnInit, OnDestroy {
         }
     }
 
-    onClickLogin() {
+    onClickLogin(): void {
         this.login();   
     }
 
-    login() {
+    login(): void {
         const {username, password} = this.userForm;
         this.userService.loginUser(username, password);
         console.log("logging in...")

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, WritableSignal, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { TUser, UserService } from '../../services/user/user.service';
 import { FormsModule } from '@angular/forms';
@@ -13,34 +13,34 @@ import { FormsModule } from '@angular/forms';
 
 export class UserProfileComponent {
     userService: UserService = inject(UserService);
-    activatedRoute = inject(ActivatedRoute);
-    user = this.userService.user;
+    activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+    user: WritableSignal<TUser | undefined> = this.userService.user;
 
-    onClickDeleteAddress(addressIndex: number) {
+    onClickDeleteAddress(addressIndex: number) : void{
         this.deleteAddress(addressIndex);
     }
 
-    onClickEditAddress(addressIndex: number, address: string) {
+    onClickEditAddress(addressIndex: number, address: string): void {
         this.editAddress(addressIndex, address);
     }
 
-    onClickAddAddress(address: string) {
+    onClickAddAddress(address: string): void {
         this.addAddress(address);
     }
 
-    editAddress(addressIndex: number, address: string) {
+    editAddress(addressIndex: number, address: string): void {
         this.userService.editUserAddress(addressIndex, address);
     }
 
-    addAddress(address: string) {
+    addAddress(address: string): void {
         this.userService.addUserAddress(address);
     }
 
-    deleteAddress(addressIndex: number) {
+    deleteAddress(addressIndex: number): void {
         this.userService.deleteUserAddress(addressIndex);
     }
 
-    onClickLogout() {
+    onClickLogout(): void {
         this.userService.logoutUser();
     }
 }

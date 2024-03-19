@@ -1,4 +1,4 @@
-import { Injectable, inject, signal} from '@angular/core';
+import { Injectable, Signal, WritableSignal, inject, signal} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { API_URL_PRODUCT, API_URL_PRODUCTS } from '../../shared/constants';
@@ -21,18 +21,18 @@ export type TProductList = TProduct[]
 })
 
 export class ProductService {
-    private productId = signal('-1');
+    private productId: WritableSignal<string> = signal('-1');
     private httpClient: HttpClient = inject(HttpClient);
 
-    product$ = toObservable(this.productId).pipe(
+    private product$ = toObservable(this.productId).pipe(
         switchMap(productId => this.httpClient.get<TProduct>(API_URL_PRODUCT + productId)))
-    product = toSignal(this.product$);
+    product: Signal<TProduct | undefined> = toSignal(this.product$);
 
     private productList$ = this.httpClient.get<TProductList>(API_URL_PRODUCTS);
-    productList = toSignal(this.productList$);
+    productList: Signal<TProductList | undefined> = toSignal(this.productList$);
 
 
-    setProductId(id: string) {
+    setProductId(id: string): void {
         this.productId.set(id);
     }
 

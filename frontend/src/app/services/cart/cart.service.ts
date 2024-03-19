@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Injectable, OnDestroy, inject, signal } from '@angular/core';
 import { TProduct } from '../product/product.service';
 import { HttpClient } from '@angular/common/http';
-import { Subscription, take } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { UserService } from '../user/user.service';
 import { API_URL_USER, HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
 
@@ -32,7 +32,7 @@ export type TCartItemList = TCartItem[];
 export class CartService implements OnDestroy {
     private userService: UserService = inject(UserService);
     private httpClient: HttpClient = inject(HttpClient);
-    private apiSubscription = new Subscription;
+    private apiSubscription: Subscription = new Subscription;
     cartItems = signal<TCartItemList | undefined>(undefined);
     cartId : number | undefined;
 
@@ -40,7 +40,7 @@ export class CartService implements OnDestroy {
         this.apiSubscription.unsubscribe();
     }
 
-    addProductToCart(product: TProduct) {
+    addProductToCart(product: TProduct): void {
         if (this.cartId) {
 
             const cartItem: TCartItem = {
@@ -55,7 +55,7 @@ export class CartService implements OnDestroy {
                 created_at: Date.now() / 1000
             };
             
-            let cartItems = this.cartItems();
+             let cartItems = this.cartItems();
 
             if (cartItems) {
                 let found = cartItems.find(item => item.product_id === product.id);
@@ -71,12 +71,12 @@ export class CartService implements OnDestroy {
         }
     }
 
-    increaseItemQuantity(cartItem: TCartItem) {
+    increaseItemQuantity(cartItem: TCartItem): void {
         cartItem.quantity += 1;
         this.updateCartItem(cartItem);
     }
 
-    decreaseItemQuantity(cartItem: TCartItem) {
+    decreaseItemQuantity(cartItem: TCartItem): void {
         cartItem.quantity -= 1;
 
         if (cartItem.quantity === 0) {
@@ -87,7 +87,7 @@ export class CartService implements OnDestroy {
         }
     }
 
-    updateCartItem(cartItem: TCartItem) {
+    updateCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
             const URL =
              `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}/${cartItem.id}`;
@@ -96,7 +96,7 @@ export class CartService implements OnDestroy {
         }
     }
 
-    postCartItem(cartItem: TCartItem) {
+    postCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
             const URL =
              `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}`;
@@ -105,7 +105,7 @@ export class CartService implements OnDestroy {
         }
     }
 
-    getCartId() {
+    getCartId(): void {
         if (this.userService.isLoggedIn()) {
             const URL = `${API_URL_USER}${this.userService.getUserId()}/cart/info`;
 
@@ -117,9 +117,11 @@ export class CartService implements OnDestroy {
         }
     }
 
-    getCartItems() {
+    getCartItems(): void {
         if (this.userService.isLoggedIn()) {
             const URL = `${API_URL_USER}${this.userService.getUserId()}/cart`;
+
+            this.queryAPI(HTTP_GET, URL);
 
             const callback = (cartItems: TCartItemList) => {
                 if (cartItems.length > 0) {
@@ -141,7 +143,8 @@ export class CartService implements OnDestroy {
     }
 
     computeTotalPrice(): number {
-        let cartItems = this.cartItems();
+        let cartItems = this.cartItems()
+
         if (cartItems) {
             let total: number = 0;  
             for (let item of cartItems) {
@@ -154,20 +157,20 @@ export class CartService implements OnDestroy {
     }
 
 
-    queryAPI<T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void), payload?: any ) {
+    queryAPI<T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void), payload?: any ): void {
 
         switch(requestType) {
             case HTTP_GET:
-                this.apiSubscription = this.httpClient.get<T>(URL).pipe(take(1)).subscribe(callback);
+                this.apiSubscription = this.httpClient.get<T>(URL).subscribe(callback);
                 break;
             case HTTP_POST: 
-                this.apiSubscription = this.httpClient.post<T>(URL, payload).pipe(take(1)).subscribe(callback);
+                this.apiSubscription = this.httpClient.post<T>(URL, payload).subscribe(callback);
                 break;
             case HTTP_PATCH: 
-                this.apiSubscription = this.httpClient.patch<T>(URL, payload).pipe(take(1)).subscribe(callback);
+                this.apiSubscription = this.httpClient.patch<T>(URL, payload).subscribe(callback);
             break;
             case HTTP_DELETE:
-                this.apiSubscription =  this.httpClient.delete<T>(URL).pipe(take(1)).subscribe(callback);
+                this.apiSubscription =  this.httpClient.delete<T>(URL).subscribe(callback);
                 break;
             default: 
                 console.log("error: unkown request type")

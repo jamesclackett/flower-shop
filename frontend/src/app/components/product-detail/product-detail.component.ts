@@ -1,9 +1,7 @@
-import { Component, Input, OnInit, inject, Signal, OnDestroy, signal, ChangeDetectorRef} from '@angular/core';
+import { Component, Input, OnInit, Signal, inject} from '@angular/core';
 import { ProductService, TProduct } from '../../services/product/product.service';
 import { CartService } from '../../services/cart/cart.service';
 import { API_URL_IMAGE } from '../../shared/constants';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Subscriber, Subscription } from 'rxjs';
 import { UserService } from '../../services/user/user.service';
 
 
@@ -17,14 +15,13 @@ import { UserService } from '../../services/user/user.service';
 
 
 export class ProductDetailComponent implements OnInit {
-    @Input() 
-    private id = ''
-    private productService = inject(ProductService);
-    private cartService = inject(CartService);
-    private userService = inject(UserService);
+    @Input() private id: string = ''
+    private productService: ProductService = inject(ProductService);
+    private cartService: CartService = inject(CartService);
+    private userService: UserService= inject(UserService);
     
-    imageURL = API_URL_IMAGE;
-    product = this.productService.product;
+    imageURL: string = API_URL_IMAGE;
+    product: Signal<TProduct | undefined> = this.productService.product;
 
     ngOnInit(): void { 
         this.productService.setProductId(this.id); 
@@ -32,7 +29,7 @@ export class ProductDetailComponent implements OnInit {
         this.cartService.getCartId();
     }
 
-    onClickAddToCart() { 
+    onClickAddToCart(): void { 
         if (this.userService.isLoggedIn()) {
             this.addToCart();
         } else {
@@ -41,7 +38,7 @@ export class ProductDetailComponent implements OnInit {
          
     }
 
-    private addToCart() {
+    private addToCart(): void {
         let product = this.product();
         if (product) {
             this.cartService.addProductToCart(product);

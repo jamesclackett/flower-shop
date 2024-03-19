@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, OnDestroy, inject, numberAttribute, signal } from '@angular/core';
+import { Injectable, OnDestroy, WritableSignal, inject, numberAttribute, signal } from '@angular/core';
 import { API_URL_USER } from '../../shared/constants';
 import { Observable, Subscription, subscribeOn, switchMap, take } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 
 export type TUser = {
     id: number;
@@ -13,14 +14,22 @@ export type TUser = {
     created_at: number;
 }
 
+export type TUserRegisterForm = {
+    username: string; 
+    password: string;
+    email: string;
+    address: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService implements OnDestroy{
-    private httpClient = inject(HttpClient);
-    user = signal<TUser | undefined> (undefined);
-    user$ = toObservable(this.user);
-    apiSubscription = new Subscription;
+    private httpClient: HttpClient = inject(HttpClient);
+    router: Router = inject(Router)
+    user: WritableSignal<TUser | undefined> = signal<TUser | undefined> (undefined);
+    user$: Observable<TUser | undefined> = toObservable(this.user);
+    apiSubscription: Subscription = new Subscription;
 
     getUserId(): number | undefined{
         let user = this.user();
@@ -32,7 +41,7 @@ export class UserService implements OnDestroy{
         return user ? true: false;
     }
 
-    loginUser(username: string, password: string) {
+    loginUser(username: string, password: string): void {
         this.apiSubscription = this.findUser(username).pipe(take(1)).subscribe(
             (user) => {
                 if (user && user.password === password) {
@@ -52,7 +61,7 @@ export class UserService implements OnDestroy{
         return this.httpClient.get<TUser>(API_URL_USER + username);
     }
 
-    editUserAddress(addressIndex: number, address: string) {
+    editUserAddress(addressIndex: number, address: string): void {
         let user = this.user();
         if (user) {
             user.address_list[addressIndex] = address;
@@ -60,7 +69,7 @@ export class UserService implements OnDestroy{
         }   
     }
     
-    addUserAddress(address: string) {
+    addUserAddress(address: string): void {
         let user = this.user();
         if (user) {
             user.address_list.push(address);
@@ -68,7 +77,7 @@ export class UserService implements OnDestroy{
         }
     }
 
-    deleteUserAddress(addressIndex: number) {
+    deleteUserAddress(addressIndex: number): void {
         let user = this.user();
         if (user) {
             if (user.address_list.length > 1) {
@@ -81,7 +90,7 @@ export class UserService implements OnDestroy{
         }
     }
 
-    updateUser(user: TUser) {
+    updateUser(user: TUser): void {
         const URL = `${API_URL_USER}${user.id}`
             this.apiSubscription = this.httpClient.patch(URL, {"user" : user}).pipe(take(1)).subscribe(
                 () => {this.user.set(user)}
@@ -90,5 +99,21 @@ export class UserService implements OnDestroy{
 
     ngOnDestroy() : void {
         this.apiSubscription.unsubscribe();
+    }
+
+    registerUser(form: TUserRegisterForm): void {
+
+        const user: TUser = {
+            id: -1, 
+            username: form.username, 
+            password: form.password,
+            email: form.email,
+            address_list: [form.address] ,
+            created_at: Date.now()  / 1000
+        }
+        this.httpClient.post(API_URL_USER, {"user" : user}).pipe(take(1)).subscribe(
+            (res) => { this.router.navigate(['/user-login'])},
+            (err) => {console.log(err)}
+        );
     }
 }
