@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, inject, Signal, OnDestroy, signal, ChangeDetectorRef} from '@angular/core';
-import { ProductListServiceService, TProduct } from '../../services/product-list-service/product-list-service.service';
-import { CartServicesService } from '../../services/cart-services/cart-services.service';
+import { ProductService, TProduct } from '../../services/product/product.service';
+import { CartService } from '../../services/cart/cart.service';
 import { API_URL_IMAGE } from '../../shared/constants';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subscriber, Subscription } from 'rxjs';
@@ -19,15 +19,15 @@ import { UserService } from '../../services/user/user.service';
 export class ProductDetailComponent implements OnInit {
     @Input() 
     private id = ''
-    private productListService = inject(ProductListServiceService);
-    private cartService = inject(CartServicesService);
+    private productService = inject(ProductService);
+    private cartService = inject(CartService);
     private userService = inject(UserService);
     
     imageURL = API_URL_IMAGE;
-    product = this.productListService.product;
+    product = this.productService.product;
 
     ngOnInit(): void { 
-        this.productListService.setProductId(this.id); 
+        this.productService.setProductId(this.id); 
         this.cartService.getCartItems();
         this.cartService.getCartId();
     }

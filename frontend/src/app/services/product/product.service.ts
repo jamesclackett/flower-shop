@@ -1,4 +1,4 @@
-import { Injectable, OnInit, Signal, computed, inject, signal} from '@angular/core';
+import { Injectable, inject, signal} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { API_URL_PRODUCT, API_URL_PRODUCTS } from '../../shared/constants';
@@ -20,7 +20,7 @@ export type TProductList = TProduct[]
   providedIn: 'root'
 })
 
-export class ProductListServiceService {
+export class ProductService {
     private productId = signal('-1');
     private httpClient: HttpClient = inject(HttpClient);
 

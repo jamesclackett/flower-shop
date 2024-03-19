@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CartServicesService, TCartItem } from '../../services/cart-services/cart-services.service';
+import { CartService, TCartItem } from '../../services/cart/cart.service';
 import { API_URL_IMAGE } from '../../shared/constants';
 
 @Component({
@@ -10,7 +10,7 @@ import { API_URL_IMAGE } from '../../shared/constants';
   styleUrl: './cart.component.scss'
 })
 export class CartComponent  implements OnInit {
-    cartService = inject(CartServicesService);
+    cartService = inject(CartService);
     cartItems = this.cartService.cartItems;
     imageURL = API_URL_IMAGE;
 

@@ -1,0 +1,17 @@
+* Assess observable/signal/subscription use and refactor as necessary
+    - if using observables. The service methods should return an observable, and then
+        the component should subscribe and provdide callbacks.
+* Assess module imports. Make sure imported in App Component when necessary
+* Ensure types are added everywhere
+* Add httpHeaders 
+* Use Subject/BehaviourSubject
+* Jest Unit testing
+* New components for re-usable items like buttons etc
+    * Implement Input() and Output()
+    * Output basically passes the event emission to its parent. This allows it to be more customizable (i.e. you dont need to create multiple components to handle different onClick behaviours)
+* New styling ideas: 
+    - fonts
+    - make address forums appear/dissappear on click
+    - basic animations
+    - form-control
+* Authentication and Authorizations (change id from number to string)

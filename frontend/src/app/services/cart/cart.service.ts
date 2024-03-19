@@ -1,12 +1,12 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
-import { TProduct } from '../product-list-service/product-list-service.service';
+import { TProduct } from '../product/product.service';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, take } from 'rxjs';
 import { UserService } from '../user/user.service';
 import { API_URL_USER, HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
 
 export type TCartItem = {
-    id: number,
+    id?: number,
     cart_id: number,
     product_id: number,
     quantity: number,
@@ -29,7 +29,7 @@ export type TCartItemList = TCartItem[];
 @Injectable({
   providedIn: 'root'
 })
-export class CartServicesService implements OnDestroy {
+export class CartService implements OnDestroy {
     private userService: UserService = inject(UserService);
     private httpClient: HttpClient = inject(HttpClient);
     private apiSubscription = new Subscription;
@@ -44,7 +44,6 @@ export class CartServicesService implements OnDestroy {
         if (this.cartId) {
 
             const cartItem: TCartItem = {
-                id:  -1, 
                 cart_id :  this.cartId, 
                 product_id : product.id,
                 quantity : 1,
