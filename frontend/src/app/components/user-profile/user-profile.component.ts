@@ -7,11 +7,11 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-user',
   standalone: true,
   imports: [RouterLink, RouterLinkActive, FormsModule],
-  templateUrl: './user.component.html',
-  styleUrl: './user.component.scss'
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.scss'
 })
 
-export class UserComponent {
+export class UserProfileComponent {
     userService: UserService = inject(UserService);
     activatedRoute = inject(ActivatedRoute);
     user = this.userService.user;
