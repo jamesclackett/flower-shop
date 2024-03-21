@@ -31,6 +31,10 @@ export class UserService implements OnDestroy{
     user$: Observable<TUser | undefined> = toObservable(this.user);
     apiSubscription: Subscription = new Subscription;
 
+    ngOnDestroy() : void {
+        this.apiSubscription.unsubscribe();
+    }
+
     getUserId(): number | undefined{
         let user = this.user();
         return user ? user.id : undefined;
@@ -42,7 +46,7 @@ export class UserService implements OnDestroy{
     }
 
     loginUser(username: string, password: string): void {
-        this.apiSubscription = this.findUser(username).pipe(take(1)).subscribe(
+        this.apiSubscription = this.findUser(username).subscribe(
             (user) => {
                 if (user && user.password === password) {
                     this.user.set(user);
@@ -57,7 +61,7 @@ export class UserService implements OnDestroy{
         return user === undefined ? true : false;
     }
 
-    findUser(username: string): Observable<TUser> {
+    findUser(username: string): Observable<TUser | undefined> {
         return this.httpClient.get<TUser>(API_URL_USER + username);
     }
 
@@ -86,19 +90,14 @@ export class UserService implements OnDestroy{
             } else {
                 console.log("cannot remove users only address");
             }
-            
         }
     }
 
     updateUser(user: TUser): void {
         const URL = `${API_URL_USER}${user.id}`
-            this.apiSubscription = this.httpClient.patch(URL, {"user" : user}).pipe(take(1)).subscribe(
+            this.apiSubscription = this.httpClient.patch(URL, {"user" : user}).subscribe(
                 () => {this.user.set(user)}
             )
-    }
-
-    ngOnDestroy() : void {
-        this.apiSubscription.unsubscribe();
     }
 
     registerUser(form: TUserRegisterForm): void {
@@ -111,8 +110,8 @@ export class UserService implements OnDestroy{
             address_list: [form.address] ,
             created_at: Date.now()  / 1000
         }
-        this.httpClient.post(API_URL_USER, {"user" : user}).pipe(take(1)).subscribe(
-            (res) => { this.router.navigate(['/user-login'])},
+        this.apiSubscription = this.httpClient.post(API_URL_USER, {"user" : user}).subscribe(
+            (res) => { this.router.navigate(['/user-login'])}, // bad place for that!
             (err) => {console.log(err)}
         );
     }

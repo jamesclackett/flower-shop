@@ -15,7 +15,7 @@ import { UserService } from '../../services/user/user.service';
 
 
 export class ProductDetailComponent implements OnInit {
-    @Input() private id: string = ''
+    @Input() private id: number = -1;
     private productService: ProductService = inject(ProductService);
     private cartService: CartService = inject(CartService);
     private userService: UserService= inject(UserService);
@@ -35,7 +35,6 @@ export class ProductDetailComponent implements OnInit {
         } else {
             console.log("You must log in first")
         }
-         
     }
 
     private addToCart(): void {

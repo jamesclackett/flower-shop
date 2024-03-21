@@ -21,7 +21,7 @@ export type TProductList = TProduct[]
 })
 
 export class ProductService {
-    private productId: WritableSignal<string> = signal('-1');
+    productId: WritableSignal<number> = signal(-1);
     private httpClient: HttpClient = inject(HttpClient);
 
     private product$ = toObservable(this.productId).pipe(
@@ -32,7 +32,7 @@ export class ProductService {
     productList: Signal<TProductList | undefined> = toSignal(this.productList$);
 
 
-    setProductId(id: string): void {
+    setProductId(id: number): void {
         this.productId.set(id);
     }
 

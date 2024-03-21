@@ -1,7 +1,6 @@
 import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CartService, TCartItem, TCartItemList } from '../../services/cart/cart.service';
 import { API_URL_IMAGE } from '../../shared/constants';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-cart',
@@ -33,7 +32,7 @@ export class CartComponent  implements OnInit {
     }
 
     deleteItem(cartItem: TCartItem): void {
-        this.cartService.deleteItem(cartItem);
+        this.cartService.deleteCartItem(cartItem);
     }
 
     decreaseItemQuantity(cartItem: TCartItem): void {

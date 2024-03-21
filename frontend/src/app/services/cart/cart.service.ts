@@ -55,7 +55,7 @@ export class CartService implements OnDestroy {
                 created_at: Date.now() / 1000
             };
             
-             let cartItems = this.cartItems();
+            let cartItems = this.cartItems();
 
             if (cartItems) {
                 let found = cartItems.find(item => item.product_id === product.id);
@@ -80,7 +80,7 @@ export class CartService implements OnDestroy {
         cartItem.quantity -= 1;
 
         if (cartItem.quantity === 0) {
-            this.deleteItem(cartItem);
+            this.deleteCartItem(cartItem);
 
         } else {
             this.updateCartItem(cartItem);
@@ -112,7 +112,6 @@ export class CartService implements OnDestroy {
             const callback = (cartInfo: TCartInfo) => {
                 if (cartInfo) this.cartId = cartInfo.id;
             }
-
             this.queryAPI(HTTP_GET, URL, callback);
         }
     }
@@ -120,8 +119,6 @@ export class CartService implements OnDestroy {
     getCartItems(): void {
         if (this.userService.isLoggedIn()) {
             const URL = `${API_URL_USER}${this.userService.getUserId()}/cart`;
-
-            this.queryAPI(HTTP_GET, URL);
 
             const callback = (cartItems: TCartItemList) => {
                 if (cartItems.length > 0) {
@@ -132,9 +129,8 @@ export class CartService implements OnDestroy {
         }
     }
 
-    deleteItem(cartItem: TCartItem): void {
+    deleteCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
-            console.log("hello")
             const URL =
              `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}/${cartItem.id}`
 
@@ -161,6 +157,7 @@ export class CartService implements OnDestroy {
 
         switch(requestType) {
             case HTTP_GET:
+                console.log("CALLED");
                 this.apiSubscription = this.httpClient.get<T>(URL).subscribe(callback);
                 break;
             case HTTP_POST: 
