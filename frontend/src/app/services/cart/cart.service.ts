@@ -6,20 +6,19 @@ import { UserService } from '../user/user.service';
 import { API_URL_USER, HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
 
 export type TCartItem = {
-    id?: number,
-    cart_id: number,
-    product_id: number,
+    uuid?: string,
+    cart_uuid: string,
+    product_uuid: string,
     quantity: number,
     product_name: string,
     description: string,
     price: number,
     stock_remaining: number,
     img_src: string,
-    created_at: number   
 }
 
 type TCartInfo = {
-    id: number
+    uuid: string
 }
 
 export type TCartItemList = TCartItem[];
@@ -34,31 +33,30 @@ export class CartService implements OnDestroy {
     private httpClient: HttpClient = inject(HttpClient);
     private apiSubscription: Subscription = new Subscription;
     cartItems = signal<TCartItemList | undefined>(undefined);
-    cartId : number | undefined;
+    cartUUID : string | undefined;
 
     ngOnDestroy(): void {
         this.apiSubscription.unsubscribe();
     }
 
     addProductToCart(product: TProduct): void {
-        if (this.cartId) {
+        if (this.cartUUID) {
 
             const cartItem: TCartItem = {
-                cart_id :  this.cartId, 
-                product_id : product.id,
+                cart_uuid :  this.cartUUID, 
+                product_uuid : product.uuid,
                 quantity : 1,
                 product_name : product.product_name,
                 description : product.description,
                 price : product.price,
                 stock_remaining : product.stock_remaining,
-                img_src : product.img_src,
-                created_at: Date.now() / 1000
+                img_src : product.img_src
             };
             
             let cartItems = this.cartItems();
 
             if (cartItems) {
-                let found = cartItems.find(item => item.product_id === product.id);
+                let found = cartItems.find(item => item.product_uuid === product.uuid);
 
                 if (!found) {
                     this.postCartItem(cartItem);
@@ -90,7 +88,7 @@ export class CartService implements OnDestroy {
     updateCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
             const URL =
-             `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}/${cartItem.id}`;
+             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}/${cartItem.uuid}`;
 
              this.queryAPI(HTTP_PATCH, URL, () => this.getCartItems(), {"cartItem" : cartItem});
         }
@@ -99,7 +97,7 @@ export class CartService implements OnDestroy {
     postCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
             const URL =
-             `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}`;
+             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}`;
 
             this.queryAPI(HTTP_POST, URL, () => this.getCartItems(), {"cartItem" : cartItem})
         }
@@ -107,10 +105,10 @@ export class CartService implements OnDestroy {
 
     getCartId(): void {
         if (this.userService.isLoggedIn()) {
-            const URL = `${API_URL_USER}${this.userService.getUserId()}/cart/info`;
+            const URL = `${API_URL_USER}${this.userService.getUserUUID()}/cart/info`;
 
             const callback = (cartInfo: TCartInfo) => {
-                if (cartInfo) this.cartId = cartInfo.id;
+                if (cartInfo) this.cartUUID = cartInfo.uuid;
             }
             this.queryAPI(HTTP_GET, URL, callback);
         }
@@ -118,10 +116,10 @@ export class CartService implements OnDestroy {
 
     getCartItems(): void {
         if (this.userService.isLoggedIn()) {
-            const URL = `${API_URL_USER}${this.userService.getUserId()}/cart`;
+            const URL = `${API_URL_USER}${this.userService.getUserUUID()}/cart`;
 
             const callback = (cartItems: TCartItemList) => {
-                if (cartItems.length > 0) {
+                if (cartItems && cartItems.length > 0) {
                     this.cartItems.set(cartItems);
                 } else this.cartItems.set(undefined);
             }
@@ -132,7 +130,7 @@ export class CartService implements OnDestroy {
     deleteCartItem(cartItem: TCartItem): void {
         if(this.userService.isLoggedIn()) {
             const URL =
-             `${API_URL_USER}${this.userService.getUserId()}/cart/${cartItem.cart_id}/${cartItem.id}`
+             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}/${cartItem.uuid}`
 
             this.queryAPI(HTTP_DELETE, URL, () => this.getCartItems());
         }
@@ -157,7 +155,6 @@ export class CartService implements OnDestroy {
 
         switch(requestType) {
             case HTTP_GET:
-                console.log("CALLED");
                 this.apiSubscription = this.httpClient.get<T>(URL).subscribe(callback);
                 break;
             case HTTP_POST: 

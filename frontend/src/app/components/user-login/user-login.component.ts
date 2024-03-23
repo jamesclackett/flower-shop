@@ -19,13 +19,11 @@ export class UserLoginComponent implements OnInit, OnDestroy {
     loginSubscription: Subscription = new Subscription;
 
     ngOnInit(): void {
-        this.loginSubscription = this.userService.user$.subscribe(
-            () => {if (this.userService.isLoggedIn()) {
-                this.router.navigate(['/user/', this.userService.getUserId()]);
-            }}
-        )
         if (this.userService.isLoggedIn()) {
-            this.router.navigate(['/user/', this.userService.getUserId()]);
+            this.router.navigate(['/user/', this.userService.getUserUUID()]);
+        }
+        if (this.userService.isLoggedIn()) {
+            this.router.navigate(['/user/', this.userService.getUserUUID()]);
         }
     }
 
@@ -35,8 +33,17 @@ export class UserLoginComponent implements OnInit, OnDestroy {
 
     login(): void {
         const {username, password} = this.userForm;
-        this.userService.loginUser(username, password);
         console.log("logging in...")
+        
+        const didLogin$ = this.userService.loginUser(username, password);
+        this.loginSubscription = didLogin$.subscribe({
+            next: (success) => {
+                this.router.navigate(['/user/', this.userService.getUserUUID()]);
+            },
+            error: (error) => {
+                console.log("error logging in: ", error);
+            }
+        })
     }
 
     ngOnDestroy(): void {

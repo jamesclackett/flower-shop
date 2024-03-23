@@ -8,8 +8,8 @@
                 @for (product of productList(); track product) {
                     <div class="product-list-item">
                         <img class="list-item-image" src="{{imageURL +  product.img_src }}" 
-                        alt="flower image" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">
-                        <a class="list-item-title" routerLink="product-detail/{{ product.id }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.product_name}}</a>
+                        alt="flower image" routerLink="product-detail/{{ product.uuid }}" routerLinkActive="active" ariaCurrentWhenActive="page">
+                        <a class="list-item-title" routerLink="product-detail/{{ product.uuid }}" routerLinkActive="active" ariaCurrentWhenActive="page">{{ product.product_name}}</a>
                     </div>
                 } @empty {
                     <div>Nothing found!</div>

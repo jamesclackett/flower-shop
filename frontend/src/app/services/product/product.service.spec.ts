@@ -24,12 +24,10 @@ describe('ProductService', () => {
         expect(productService).toBeTruthy();
     })
 
-    describe('setProductId', () => {
-        it('should set product id with the provided id', () => {
-            const id = 1;
-            productService.setProductId(id);
-            //httpTestingController.expectOne(API_URL_PRODUCT + id);
-            expect(productService.productId()).toBe(id);
+    describe('setProductSignal', () => {
+        it('should make http call for search', () => {
+            productService.setProductSignal('test_uuid')
+            httpTestingController.expectOne(API_URL_PRODUCT + 'test_uuid');
         })
     })
 })

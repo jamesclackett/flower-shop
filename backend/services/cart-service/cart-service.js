@@ -1,39 +1,43 @@
 const queryDatabase = require('../../config/database/query-database')
 
-// TODO: Change this to use an SQL join instead.
-
-// app.get('/user/:userId/cart', cartService.getCartItems);
-// app.post('/user/:userId/cart/:cartId', cartService.postCartItem)
-// app.patch('/user/:userId/cart/:cartId', cartService.patchCartItem)
 
 const getCartItems = async (req, res) => {
-    const cartId = await getCartByUserId(req.params.userId);
+    const userUUID = req.params.userUUID;
+    const cartUUID = await getCartByUserUUID(userUUID);
 
-    if (!cartId) {
-        res.status(400).send();
-        return;
+    if (!cartUUID) {
+        console.log("user doesnt seem to have a cart.");
+        console.log("creating cart for user", userUUID);
+        const createdCart = await postCart(userUUID);
+        if (createdCart) {
+            res.status(200).send();
+            return
+        } else {
+            res.status(400).send();
+            return;
+        }
     }
 
     const result = await queryDatabase(`
     SELECT cart_item.*, p.product_name, p.description, p.price, p.stock_remaining, p.img_src
     FROM cart_item
-    INNER JOIN product as p ON cart_item.product_id = p.id
-    WHERE cart_item.cart_id = ${cartId};`);
+    INNER JOIN product as p ON cart_item.product_uuid = p.uuid
+    WHERE cart_item.cart_uuid = '${cartUUID}';`);
     if (result) {
         res.send(result.rows)
     }
 }
 
 const getCartInfo = async (req, res) => {
-    const userId = req.params.userId;
+    const userUUID = req.params.userUUID;
 
-    if (!userId) {
+    if (!userUUID) {
         res.status(400).send();
         return;
     } 
 
     const cartInfo = {
-        id: await getCartByUserId(userId)
+        uuid: await getCartByUserUUID(userUUID)
     }
     
     if (!cartInfo) {
@@ -45,24 +49,24 @@ const getCartInfo = async (req, res) => {
 
 }
 
-const getCartByUserId = async (userId) => {
-    if (!userId) {
+const getCartByUserUUID = async (userUUID) => {
+    if (!userUUID) {
         return;
     }
-    console.log('cart requested for user', userId);
-    const result = await queryDatabase(`SELECT * FROM "cart" WHERE user_id =${userId}`);
+    console.log('cart requested for user', userUUID);
+    const result = await queryDatabase(`SELECT * FROM "cart" WHERE user_uuid = '${userUUID}'`);
     if (result.rows.length > 0) {
-        return result.rows[0].id;
+        return result.rows[0].uuid;
     }
 }
 
 const deleteCartItem = async (req, res) => {
-    const itemId = req.params.itemId;
-    if (!itemId) {
+    const itemUUID = req.params.itemUUID;
+    if (!itemUUID) {
         res.status(400).send();
         return;
     }
-    const result = await queryDatabase(`DELETE FROM "cart_item" WHERE id = ${itemId}`);
+    const result = await queryDatabase(`DELETE FROM "cart_item" WHERE uuid = '${itemUUID}'`);
 
     if (result) {
         res.status(204).send();
@@ -70,6 +74,13 @@ const deleteCartItem = async (req, res) => {
         res.status(400).send();
     }
     return;
+}
+
+const postCart = async (userUUID) => {
+    if (userUUID) {
+        return await queryDatabase(`INSERT INTO "cart" (user_uuid) VALUES ('${userUUID}')`)
+    }
+    return
 }
 
 const postCartItem = async (req, res) => {
@@ -80,8 +91,7 @@ const postCartItem = async (req, res) => {
         return;
     }
 
-    console.log(`INSERT INTO "cart_item" (cart_id, product_id, quantity, created_at) VALUES (${cartItem.cart_id}, ${cartItem.product_id}, ${cartItem.quantity }, ${cartItem.created_at})`)
-    const result = await queryDatabase(`INSERT INTO "cart_item" (cart_id, product_id, quantity, created_at) VALUES (${cartItem.cart_id}, ${cartItem.product_id}, ${cartItem.quantity }, ${cartItem.created_at})`)
+    const result = await queryDatabase(`INSERT INTO "cart_item" (cart_uuid, product_uuid, quantity) VALUES ('${cartItem.cart_uuid}', '${cartItem.product_uuid}', ${cartItem.quantity })`)
 
     if (result) {
         res.status(201).send();
@@ -95,13 +105,13 @@ const postCartItem = async (req, res) => {
 const patchCartItem = async (req, res) => {
     const cartItem = req.body.cartItem;
 
-    if (!cartItem || cartItem.id != req.params.itemId) {
+    if (!cartItem || cartItem.uuid != req.params.itemUUID) {
         res.status(400).send();
         return;
     }
 
     const result = 
-        await queryDatabase(`UPDATE "cart_item" SET quantity = ${cartItem.quantity} WHERE id = ${cartItem.id}`);
+        await queryDatabase(`UPDATE "cart_item" SET quantity = ${cartItem.quantity} WHERE uuid = '${cartItem.uuid}'`);
 
     if (result) {
         res.status(200).send();
@@ -113,4 +123,4 @@ const patchCartItem = async (req, res) => {
 
 
 
-module.exports = {getCartItems, getCartInfo, postCartItem, patchCartItem, deleteCartItem};
+module.exports = {getCartItems, getCartInfo, postCart, postCartItem, patchCartItem, deleteCartItem};

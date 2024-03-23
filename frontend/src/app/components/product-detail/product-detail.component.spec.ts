@@ -3,28 +3,34 @@ import { ProductDetailComponent } from "./product-detail.component";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { signal } from "@angular/core";
 import { TProduct } from "../../services/product/product.service";
+import { TUser, UserService } from "../../services/user/user.service";
+import { CartService } from "../../services/cart/cart.service";
 
 describe('ProductDetailComponent', () => {
+    let userService: UserService;
+    let cartService: CartService;
     let pdComponent: ProductDetailComponent;
     let fixture: ComponentFixture<ProductDetailComponent>;
     let compiled: HTMLElement;
 
     const mockProduct: TProduct = {
-        id: 1,
+        uuid: '1',
         product_name: 'test_name',
         description: 'test_desc',
         price: 1.0,
         img_src: 'test_img_src',
         stock_remaining: 1,
-        created_at: 1
     }
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [ProductDetailComponent, HttpClientTestingModule]
+            imports: [ProductDetailComponent, HttpClientTestingModule],
+            providers: [UserService, CartService]
         }).compileComponents();
 
         fixture = TestBed.createComponent(ProductDetailComponent);
+        userService = TestBed.inject(UserService);
+        cartService = TestBed.inject(CartService);
         pdComponent = fixture.componentInstance;
         compiled = fixture.nativeElement as HTMLElement;
         fixture.detectChanges();
@@ -57,8 +63,41 @@ describe('ProductDetailComponent', () => {
         buttonElem?.dispatchEvent(new Event('click'));
         expect(onClickAddToCartSpy).toHaveBeenCalled()
     })
-    it('should call cartService.addToCart if user is logged in', () => {
-        // addToCart is private, no way to test
+    describe('onClickAddToCart', () => {
+        it('should call addToCart if user is logged in', () => {
+            const addProductToCartSpy = jest.spyOn(cartService, 'addProductToCart')
+
+            const mockUser: TUser = {
+                uuid: '1',
+                username: 'test',
+                password: 'test',
+                email: 'testmail',
+                address_list: []
+            }
+
+            const mockProduct: TProduct = {
+                uuid: '1',
+                product_name: 'test_name',
+                description: 'test_desc',
+                price: 1.0,
+                img_src: 'test_img_src',
+                stock_remaining: 1
+            }
+
+            userService.user.set(mockUser);
+            pdComponent.product = signal<TProduct | undefined>(mockProduct);
+            pdComponent.onClickAddToCart()
+            expect(addProductToCartSpy).toHaveBeenCalled();
+            
+        })
+        it('should not call call addToCart if user isnt logged in', () => {
+            const addProductToCartSpy = jest.spyOn(cartService, 'addProductToCart')
+            userService.user.set(undefined);
+            pdComponent.product = signal<TProduct | undefined>(undefined);
+            pdComponent.onClickAddToCart()
+            expect(addProductToCartSpy).not.toHaveBeenCalled();
+        })
     })
+    
 
 })

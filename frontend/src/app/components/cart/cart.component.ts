@@ -15,6 +15,7 @@ export class CartComponent  implements OnInit {
     imageURL: string = API_URL_IMAGE;
 
     ngOnInit(): void {
+        this.cartService.cartItems.set(undefined);
         this.cartService.getCartItems();
         this.cartService.getCartId();
     }

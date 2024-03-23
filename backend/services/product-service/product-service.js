@@ -8,9 +8,9 @@ const getProducts = async (req, res) => {
 
 
 const getProduct = async (req, res) => {
-    const productId = req.params.productId;
-    console.log('product list requested for', productId);
-    const result = await queryDatabase(`SELECT * FROM "product" WHERE id = '${productId}'`);
+    const productUUID = req.params.productUUID;
+    console.log(`product ${productUUID} requested`);
+    const result = await queryDatabase(`SELECT * FROM "product" WHERE uuid = '${productUUID}'`);
     res.send(result.rows[0]);
 }
 

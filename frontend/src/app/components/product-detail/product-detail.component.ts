@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Signal, inject} from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Signal, WritableSignal, inject} from '@angular/core';
 import { ProductService, TProduct } from '../../services/product/product.service';
 import { CartService } from '../../services/cart/cart.service';
 import { API_URL_IMAGE } from '../../shared/constants';
@@ -14,19 +14,23 @@ import { UserService } from '../../services/user/user.service';
 })
 
 
-export class ProductDetailComponent implements OnInit {
-    @Input() private id: number = -1;
+export class ProductDetailComponent implements OnInit, OnDestroy {
+    @Input() private uuid: string = '';
     private productService: ProductService = inject(ProductService);
     private cartService: CartService = inject(CartService);
     private userService: UserService= inject(UserService);
     
     imageURL: string = API_URL_IMAGE;
-    product: Signal<TProduct | undefined> = this.productService.product;
+    product: WritableSignal<TProduct | undefined> = this.productService.product;
 
     ngOnInit(): void { 
-        this.productService.setProductId(this.id); 
+        this.productService.setProductSignal(this.uuid); 
         this.cartService.getCartItems();
         this.cartService.getCartId();
+    }
+
+    ngOnDestroy(): void {
+        this.product.set(undefined);
     }
 
     onClickAddToCart(): void { 

@@ -22,12 +22,11 @@ describe('UserService', () => {
         userService.user.set(undefined);
 
         mockUser = {
-            id: 99,
+            uuid: '1',
             username: 'test_user',
             password: 'test_pass',
             email: '',
-            address_list: ['test1', 'test2'],
-            created_at: 0
+            address_list: ['test1', 'test2']
         }
     });
 
@@ -47,15 +46,15 @@ describe('UserService', () => {
         })
     })
 
-    describe('getUserId', () => {
-        it('should return valid user id if user is defined', () => {
+    describe('getUserUUID', () => {
+        it('should return valid user UUID if user is defined', () => {
             userService.user.set(mockUser);
-            expect(userService.getUserId()).toEqual(99);
+            expect(userService.getUserUUID()).toEqual('1');
         })
         ;
         it('should return undefined if user is undefined', () => {
             userService.user.set(undefined);
-            expect(userService.getUserId()).toEqual(undefined);
+            expect(userService.getUserUUID()).toEqual(undefined);
         });
     });
 
@@ -131,14 +130,13 @@ describe('UserService', () => {
             userService.editUserAddress(2, "test address edit");
 
             const updatedUser: TUser = {
-                id: 99,
+                uuid: '1',
                 username: 'test_user',
                 password: 'test_pass',
                 email: '',
-                address_list: ['test1', 'test2', 'test address edit'],
-                created_at: 0
+                address_list: ['test1', 'test2', 'test address edit']
             }
-            httpTestingController.expectOne(API_URL_USER + mockUser.id);
+            httpTestingController.expectOne(API_URL_USER + mockUser.uuid);
             expect(updateUserSpy).toHaveBeenCalledWith(updatedUser);
         })
     })
@@ -149,14 +147,13 @@ describe('UserService', () => {
             userService.addUserAddress("test address");
 
             const updatedUser: TUser = {
-                id: 99,
+                uuid: '1',
                 username: 'test_user',
                 password: 'test_pass',
                 email: '',
-                address_list: ['test1', 'test2', 'test address'],
-                created_at: 0
+                address_list: ['test1', 'test2', 'test address']
             }
-            httpTestingController.expectOne(API_URL_USER + mockUser.id);
+            httpTestingController.expectOne(API_URL_USER + mockUser.uuid);
             expect(updateUserSpy).toHaveBeenCalledWith(updatedUser);
         })
     })
@@ -166,27 +163,25 @@ describe('UserService', () => {
             userService.user.set(mockUser);
 
             const updatedUser: TUser = {
-                id: 99,
+                uuid: '1',
                 username: 'test_user',
                 password: 'test_pass',
                 email: '',
-                address_list: ['test2'],
-                created_at: 0
+                address_list: ['test2']
             }
 
             userService.deleteUserAddress(0);
-            httpTestingController.expectOne(API_URL_USER + mockUser.id);
+            httpTestingController.expectOne(API_URL_USER + mockUser.uuid);
             expect(updateUserSpy).toHaveBeenCalledWith(updatedUser);
         })
         it ('should not call updateUser if is the users only address', () => {
 
             mockUser = {
-                id: 99,
+                uuid: '1',
                 username: 'test_user',
                 password: 'test_pass',
                 email: '',
-                address_list: ['test1'],
-                created_at: 0
+                address_list: ['test1']
             }
 
             userService.user.set(mockUser);
@@ -199,14 +194,14 @@ describe('UserService', () => {
     describe('updateUser', () => {
         it('should make a http patch request with the provided user object', () => {
             userService.updateUser(mockUser);
-            const request = httpTestingController.expectOne(API_URL_USER + mockUser.id)
+            const request = httpTestingController.expectOne(API_URL_USER + mockUser.uuid)
             const user = request.request.body.user;
             expect(request.request.method).toBe('PATCH');
             expect(user).toEqual(mockUser);
         })
         it('should set the user', async () => {
             userService.updateUser(mockUser);
-            const request = httpTestingController.expectOne(API_URL_USER + mockUser.id)
+            const request = httpTestingController.expectOne(API_URL_USER + mockUser.uuid)
             request.flush({});
             expect(userService.user()).toEqual(mockUser)
         })

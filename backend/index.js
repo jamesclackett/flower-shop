@@ -16,20 +16,21 @@ const productService = require('./services/product-service/product-service');
 
 //// Product API:
 app.get('/products', productService.getProducts);
-app.get('/product/:productId', productService.getProduct);
+app.get('/product/:productUUID', productService.getProduct);
 
 //// User API:
-//app.get('/user/:userId', userService.getUser);
-app.get('/user/:username', userService.getUserByUsername)
+//app.get('/user/:userUUID', userService.getUser);
+// app.get('/user/:username', userService.getUserByUsername)
 app.post('/user', userService.postUser);
-app.patch('/user/:userId', userService.patchUser);
+app.post('/user/login', userService.loginUser)
+app.patch('/user/:userUUID', userService.patchUser);
 
 //// Cart API:
-app.get('/user/:userId/cart', cartService.getCartItems);
-app.get('/user/:userId/cart/info', cartService.getCartInfo)
-app.post('/user/:userId/cart/:cartId', cartService.postCartItem)
-app.patch('/user/:userId/cart/:cartId/:itemId', cartService.patchCartItem)
-app.delete('/user/:userId/cart/:cartId/:itemId', cartService.deleteCartItem)
+app.get('/user/:userUUID/cart', cartService.getCartItems);
+app.get('/user/:userUUID/cart/info', cartService.getCartInfo)
+app.post('/user/:userUUID/cart/:cartUUID', cartService.postCartItem)
+app.patch('/user/:userUUID/cart/:cartUUID/:itemUUID', cartService.patchCartItem)
+app.delete('/user/:userUUID/cart/:cartUUID/:itemUUID', cartService.deleteCartItem)
 
 //// Resources API:
 app.get('/image/:imageName', mediaService.getImage);

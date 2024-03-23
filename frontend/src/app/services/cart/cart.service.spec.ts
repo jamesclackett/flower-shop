@@ -3,56 +3,63 @@ import { HttpClientTestingModule, HttpTestingController } from "@angular/common/
 import { CartService, TCartItem, TCartItemList } from "./cart.service";
 import { API_URL, API_URL_USER, HTTP_DELETE, HTTP_GET, HTTP_PATCH, HTTP_POST } from "../../shared/constants";
 import { TProduct } from "../product/product.service";
+import { UserService } from "../user/user.service";
 
 describe('CartService', () => {
     let cartService: CartService;
+    let userService: UserService;
     let httpTestingController: HttpTestingController;
     let mockItem: TCartItem;
     let mockProduct: TProduct;
     let mockCartItems: TCartItemList;
-    let orginalQuery:  <T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void) | undefined, payload?: any) => void
+    let queryAPIOrig:  <T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void) | undefined, payload?: any) => void;
+    let getCartItemsOrig: () => void;
     const mockQueryAPI = jest.fn();
+    const mockGetCartItems = jest.fn();
 
     // spies:
     let postCartItemSpy: jest.SpyInstance<void, [cartItem: TCartItem]>;
     let increaseItemSpy: jest.SpyInstance<void, [cartItem: TCartItem]>;
     let isLoggedInSpy: jest.SpyInstance<boolean, []>;
+    let getCartItemsSpy: jest.SpyInstance<void, []>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [CartService]
+            providers: [CartService, UserService]
         })
         
         cartService = TestBed.inject(CartService);
-        orginalQuery = cartService['queryAPI'];
+        userService = TestBed.inject(UserService);
+        queryAPIOrig = cartService['queryAPI'];
         cartService['queryAPI'] = mockQueryAPI;
+        getCartItemsOrig = cartService['getCartItems'];
+        cartService['getCartItems'] = mockGetCartItems;
         httpTestingController = TestBed.inject(HttpTestingController);
         postCartItemSpy = jest.spyOn(cartService, 'postCartItem');
         increaseItemSpy = jest.spyOn(cartService, 'increaseItemQuantity');
         isLoggedInSpy = jest.spyOn(cartService['userService'], 'isLoggedIn')
+        getCartItemsSpy = jest.spyOn(cartService, 'getCartItems');
 
 
         mockProduct = {
-            id: 1,
+            uuid: '1',
             product_name: 'test_name',
             description: 'test_desc',
             price: 1.0,
             img_src: 'test_img_src',
-            stock_remaining: 1,
-            created_at: 1
+            stock_remaining: 1
         }
 
         mockItem = {
-            cart_id: 1,
-            product_id: 1,
+            cart_uuid: '1',
+            product_uuid: '1',
             quantity: 1,
             product_name: 'test_name',
             description: 'test_desc',
             price: 1.0,
             stock_remaining: 1,
-            img_src: 'test_img_src',
-            created_at: 1,
+            img_src: 'test_img_src'
         };
 
         mockCartItems = [mockItem];
@@ -62,6 +69,7 @@ describe('CartService', () => {
     afterEach(() => {
         httpTestingController.verify();
         mockQueryAPI.mockClear();
+        mockGetCartItems.mockClear();
     })
 
     it('should create a service', () => {
@@ -85,28 +93,27 @@ describe('CartService', () => {
         })
         it('should call postCartItem(item) if cart is empty/undefined', () => {  
             cartService.cartItems.set(undefined);  
-            cartService.cartId = 1;
+            cartService.cartUUID = '1';
             cartService.addProductToCart(mockProduct);
             expect(postCartItemSpy).toHaveBeenCalled();
         });
         it('should call postCartItem(item) if item doesnt exist in cart yet', () => {
             const nonExistProduct: TProduct = {
-                id: -1,
+                uuid: '99',
                 product_name: 'test_name',
                 description: 'test_desc',
                 price: 1.0,
                 img_src: 'test_img_src',
-                stock_remaining: 1,
-                created_at: 1
+                stock_remaining: 1
             }
-            cartService.cartId = 1;
+            cartService.cartUUID = '1';
             cartService.cartItems.set(mockCartItems);
             cartService.addProductToCart(nonExistProduct);
             expect(postCartItemSpy).toHaveBeenCalled();
             expect(increaseItemSpy).not.toHaveBeenCalled();
         });
         it('should call increaseItemQuantity(item) if item exists in cart', () => {
-            cartService.cartId = 1;
+            cartService.cartUUID = '1';
             cartService.cartItems.set(mockCartItems);
             cartService.addProductToCart(mockProduct);
             expect(increaseItemSpy).toHaveBeenCalled();
@@ -157,6 +164,14 @@ describe('CartService', () => {
             cartService.updateCartItem(mockItem);
             expect(mockQueryAPI).toHaveBeenCalled();
         })
+        it('if queryApi called, getCartItems should also be called', () => {
+            isLoggedInSpy.mockReturnValue(true);
+            cartService['queryAPI'] = queryAPIOrig;
+            cartService.updateCartItem(mockItem);
+            const req = httpTestingController.expectOne(API_URL + 'user/undefined/cart/1/undefined')
+            req.flush({});
+            expect(getCartItemsSpy).toHaveBeenCalled();
+        })
     })
 
     describe('postCartItem', () => {
@@ -193,6 +208,7 @@ describe('CartService', () => {
         })
         it('should call queryAPI', () => {
             isLoggedInSpy.mockReturnValue(true);
+            cartService['getCartItems'] = getCartItemsOrig;
             cartService.getCartItems();
             expect(mockQueryAPI).toHaveBeenCalled();
         })
@@ -228,32 +244,32 @@ describe('CartService', () => {
 
     describe('queryAPI', () => {
         it('make a http get request if given a HTTP_GET argument', () => {
-            cartService['queryAPI'] = orginalQuery;
+            cartService['queryAPI'] = queryAPIOrig;
             cartService.queryAPI(HTTP_GET, API_URL, () => {}, {} )
             const request = httpTestingController.expectOne(API_URL);
             expect(request.request.method).toBe('GET');
         })
         it('make a http post request if given a HTTP_POST argument', () => {
-            cartService['queryAPI'] = orginalQuery;
+            cartService['queryAPI'] = queryAPIOrig;
             cartService.queryAPI(HTTP_POST, API_URL, () => {}, {} )
             const request = httpTestingController.expectOne(API_URL);
             expect(request.request.method).toBe('POST');
         })
         it('make a http patch request if given a HTTP_PATCH argument', () => {
-            cartService['queryAPI'] = orginalQuery;
+            cartService['queryAPI'] = queryAPIOrig;
             cartService.queryAPI(HTTP_PATCH, API_URL, () => {}, {} )
             const request = httpTestingController.expectOne(API_URL);
             expect(request.request.method).toBe('PATCH');
         })
         it('make a http delete request if given a HTTP_DELETE argument', () => {
-            cartService['queryAPI'] = orginalQuery;
+            cartService['queryAPI'] = queryAPIOrig;
             cartService.queryAPI(HTTP_DELETE, API_URL, () => {}, {} )
             const request = httpTestingController.expectOne(API_URL);
             expect(request.request.method).toBe('DELETE');
         })
         it('should do nothing if an unknown http request argument is given', () => {
             const HTTP_UNKNOWN = -1
-            cartService['queryAPI'] = orginalQuery;
+            cartService['queryAPI'] = queryAPIOrig;
             cartService.queryAPI(HTTP_UNKNOWN, API_URL, () => {}, {} )
             httpTestingController.expectNone(API_URL);
         })

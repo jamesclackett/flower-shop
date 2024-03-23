@@ -10,13 +10,12 @@ describe('ProductListComponent', () => {
     let fixture: ComponentFixture<ProductListComponent>;
 
     const mockProduct: TProduct = {
-        id: 1,
+        uuid: '1',
         product_name: 'test_name',
         description: 'test_desc',
         price: 1.0,
         img_src: 'test_img_src',
-        stock_remaining: 1,
-        created_at: 1
+        stock_remaining: 1
     }
 
     const mockProductList: TProductList = [mockProduct];
