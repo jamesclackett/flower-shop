@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, inject, signal } from '@angular/core';
 import { TProduct } from '../product/product.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { UserService } from '../user/user.service';
 import { API_URL_USER, HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
@@ -152,7 +152,6 @@ export class CartService implements OnDestroy {
 
 
     queryAPI<T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void), payload?: any ): void {
-
         switch(requestType) {
             case HTTP_GET:
                 this.apiSubscription = this.httpClient.get<T>(URL).subscribe(callback);

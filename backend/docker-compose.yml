@@ -1,0 +1,56 @@
+services:
+
+  auth-service:
+    build: ./services
+    ports:
+      - '8000:8000'
+      - '5432:5432'
+    volumes:
+      - .:/app
+    networks:
+      - flower-network
+
+  cart-service:
+    build: ./services
+    ports:
+      - '8001:8000'
+      - '5432:5432'
+    volumes:
+      - .:/app
+    networks:
+      - flower-network
+
+  media-service:
+    build: ./services
+    ports:
+      - '8002:8000'
+      - '5432:5432'
+    volumes:
+      - .:/app
+    networks:
+      - flower-network
+
+  product-service:
+    build: ./services
+    ports:
+      - '8003:8000'
+      - '5432:5432'
+    volumes:
+      - .:/app
+    networks:
+      - flower-network
+
+  user-service:
+    build: ./services
+    ports:
+      - '8004:8000'
+      - '5432:5432'
+    volumes:
+      - .:/app
+    networks:
+      - flower-network
+
+
+networks:
+  flower-network:
+    driver: bridge

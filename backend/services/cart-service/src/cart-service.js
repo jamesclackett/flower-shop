@@ -3,6 +3,11 @@ const queryDatabase = require('../../config/database/query-database')
 
 const getCartItems = async (req, res) => {
     const userUUID = req.params.userUUID;
+
+    if (userUUID != req.decodedToken.uuid){
+        return res.status(401).json({error: "unauthorized"});
+    }
+
     const cartUUID = await getCartByUserUUID(userUUID);
 
     if (!cartUUID) {
@@ -10,11 +15,9 @@ const getCartItems = async (req, res) => {
         console.log("creating cart for user", userUUID);
         const createdCart = await postCart(userUUID);
         if (createdCart) {
-            res.status(200).send();
-            return
+            return res.status(200).send();
         } else {
-            res.status(400).send();
-            return;
+            return res.status(400).send();
         }
     }
 
@@ -24,7 +27,7 @@ const getCartItems = async (req, res) => {
     INNER JOIN product as p ON cart_item.product_uuid = p.uuid
     WHERE cart_item.cart_uuid = '${cartUUID}';`);
     if (result) {
-        res.send(result.rows)
+        return res.send(result.rows)
     }
 }
 

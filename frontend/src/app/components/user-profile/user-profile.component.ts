@@ -41,6 +41,7 @@ export class UserProfileComponent {
     }
 
     onClickLogout(): void {
-        this.userService.logoutUser();
+        const success = this.userService.logoutUser();
+        if (!success) console.log("error logging out!");
     }
 }

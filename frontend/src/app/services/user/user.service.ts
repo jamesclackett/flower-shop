@@ -48,10 +48,11 @@ export class UserService implements OnDestroy{
 
         return new Observable<boolean>(observer => {
             this.apiSubscription = 
-                this.httpClient.post<TUser>(API_URL_USER + 'login', {"user": userPayload}).subscribe({
-                next: (user: TUser | undefined) => {
-                    if (user) {
-                        this.user.set(user);
+                this.httpClient.post<{user: TUser | undefined; jwtToken: string}>(API_URL_USER + 'login', {"user": userPayload}).subscribe({
+                next: (res) => {
+                    if (res.user) {
+                        this.user.set(res.user);
+                        localStorage.setItem('jwtToken', res.jwtToken);
                         observer.next(true);
                     } else {
                         this.user.set(undefined);
@@ -70,7 +71,10 @@ export class UserService implements OnDestroy{
 
     logoutUser(): boolean {
         this.user.set(undefined);
-        return this.user() === undefined ? true : false;
+        localStorage.removeItem('jwtToken');
+            if (localStorage.getItem('jwtToken')) return false;
+            if (!this.user() == undefined) return false;
+        return true;
     }
 
     editUserAddress(addressIndex: number, address: string): void {
@@ -117,9 +121,11 @@ export class UserService implements OnDestroy{
             email: form.email,
             address_list: [form.address]
         }
-        this.apiSubscription = this.httpClient.post(API_URL_USER, {"user" : user}).subscribe({
+        this.apiSubscription = this.httpClient.post(API_URL_USER + 'register', {"user" : user}).subscribe({
             next: () => { this.router.navigate(['/user/login']) },
             error: (error) => { console.log(error) }
         })
     }
+
+    
 }

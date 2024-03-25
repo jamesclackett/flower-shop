@@ -1,0 +1,11 @@
+{   
+    "name": "user-service",
+    "scripts": {
+        "start": "node src/index.js"
+    },
+    "dependencies": {
+    "express": "^4.19.1",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "16.4.5"
+  }
+}
