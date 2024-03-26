@@ -1,12 +1,11 @@
-import { dotenv } from "dotenv";
-import { sign } from "jsonwebtoken";
-import { axios } from "axios";
-dotenv.config();
+const { sign } = require('jsonwebtoken');
+const axios = require('axios');
+require('dotenv').config();
 
 const env = process.env;
 
 // generates a JWT for user with basic privileges for a given exp time
-export const generateUserJWT = async (username, expireIn) => {
+const generateUserJWT = async (username, expireIn) => {
     const tokenPayload = {
         "uuid": await getUserUUID(username),
         "username": username,
@@ -17,7 +16,7 @@ export const generateUserJWT = async (username, expireIn) => {
 }
 
 // generates a JWT for user with basic privileges for a given exp time
-export const generateServiceJWT = async (expireIn) => {
+const generateServiceJWT = async (expireIn) => {
     const tokenPayload = {
         "sub": 'auth-service',
         "role": "service",
@@ -36,3 +35,5 @@ const getUserUUID = async (username) => {
     if (!test) throw new Error('user not found');
     return test;
 }
+
+module.exports = { generateServiceJWT, generateUserJWT };

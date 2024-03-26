@@ -1,8 +1,8 @@
-import queryDatabase from '../utils/database/query-database';
+const queryDatabase = require('../utils/database/query-database');
 
 
 // get all products
-export const getProducts = async (req, res) => {
+const getProducts = async (req, res) => {
     console.log('product list requested');
     try {
         const result = await queryDatabase(`SELECT * FROM "product"`);
@@ -15,7 +15,7 @@ export const getProducts = async (req, res) => {
 }
 
 // get product by productUUID
-export const getProduct = async (req, res) => {
+const getProduct = async (req, res) => {
     const productUUID = req.params.productUUID;
     console.log(`product ${productUUID} requested`);
     try {
@@ -25,5 +25,6 @@ export const getProduct = async (req, res) => {
         console.log("error getting product");
         return res.status(500).send(error);
     }
-    
 }
+
+module.exports = { getProduct, getProducts };

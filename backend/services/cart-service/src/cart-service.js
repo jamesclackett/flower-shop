@@ -1,7 +1,7 @@
-const queryDatabase = require('../../config/database/query-database')
+const queryDatabase = require('../utils/database/query-database');
 
 // Get a list of the user's cart items. If no cart exists, create one.
-export const getCartItems = async (req, res) => {
+const getCartItems = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!decodedToken.uuid){
@@ -34,7 +34,7 @@ export const getCartItems = async (req, res) => {
 }
 
 // Search for users' cart information in datatabase
-export const getCartInfo = async (req, res) => {
+const getCartInfo = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!decodedToken.uuid) {
@@ -67,7 +67,7 @@ const getCartUUID = async (userUUID) => {
 }
 
 // delete a user's cart
-export const deleteCartItem = async (req, res) => {
+const deleteCartItem = async (req, res) => {
     const decodedToken = req.decoded;
     const itemUUID = req.params.itemUUID;
 
@@ -108,7 +108,7 @@ const createCart = async (userUUID) => {
 }
 
 // adds a new cart item to the user's cart.
-export const postCartItem = async (req, res) => {
+const postCartItem = async (req, res) => {
     const cartItem = req.body.cartItem;
     const decodedToken = req.decoded;
 
@@ -139,7 +139,7 @@ export const postCartItem = async (req, res) => {
 }
 
 // updates a cart item (increased quantity, decreased quantity)
-export const patchCartItem = async (req, res) => {
+const patchCartItem = async (req, res) => {
     const cartItem = req.body.cartItem;
     const decodedToken = req.decoded;
 
@@ -168,3 +168,12 @@ export const patchCartItem = async (req, res) => {
     }
 
 }
+
+module.exports = {
+    getCartItems,
+    getCartInfo,
+    deleteCartItem,
+    postCartItem,
+    patchCartItem
+};
+

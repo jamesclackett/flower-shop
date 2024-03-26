@@ -1,56 +1,31 @@
 services:
 
   auth-service:
-    build: ./services
-    ports:
-      - '8000:8000'
-      - '5432:5432'
+    build: ./services/auth-service
     volumes:
-      - .:/app
-    networks:
-      - flower-network
+      - ./services/auth-service:/app
+    network_mode: host
 
   cart-service:
-    build: ./services
-    ports:
-      - '8001:8000'
-      - '5432:5432'
+    build: ./services/cart-service
     volumes:
-      - .:/app
-    networks:
-      - flower-network
+      - ./services/cart-service:/app
+    network_mode: host
 
   media-service:
-    build: ./services
-    ports:
-      - '8002:8000'
-      - '5432:5432'
+    build: ./services/media-service
     volumes:
-      - .:/app
-    networks:
-      - flower-network
+      - ./services/media-service:/app
+    network_mode: host
 
   product-service:
-    build: ./services
-    ports:
-      - '8003:8000'
-      - '5432:5432'
+    build: ./services/product-service
     volumes:
-      - .:/app
-    networks:
-      - flower-network
+      - ./services/product-service:/app
+    network_mode: host
 
   user-service:
-    build: ./services
-    ports:
-      - '8004:8000'
-      - '5432:5432'
+    build: ./services/user-service
     volumes:
-      - .:/app
-    networks:
-      - flower-network
-
-
-networks:
-  flower-network:
-    driver: bridge
+      - ./services/user-service:/app
+    network_mode: host

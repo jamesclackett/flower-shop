@@ -17,4 +17,4 @@ const queryDatabase =  async (queryString) => {
     return result;
 }
 
-  module.exports = queryDatabase;
+module.exports = queryDatabase;

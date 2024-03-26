@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 const pool = new Pool({
     user: 'postgres',
@@ -11,4 +11,4 @@ const queryDatabase = (queryString) => {
     return pool.query(queryString);
 }
 
-export default queryDatabase;
+module.exports = queryDatabase;

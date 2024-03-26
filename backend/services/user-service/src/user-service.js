@@ -1,7 +1,7 @@
-import queryDatabase from "../utils/database/query-database";
+const queryDatabase = require('../utils/database/query-database');
 
 // search database for user of given username
-export const getUserByUsername = async (req, res) => {
+const getUserByUsername = async (req, res) => {
     const username = req.params.username;
 
     if (!username) {
@@ -25,7 +25,7 @@ export const getUserByUsername = async (req, res) => {
 }
 
 // search database for user of given uuuid
-export const getUserByUUID = async (req, res) => {
+const getUserByUUID = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!decodedToken.uuid) {
@@ -49,7 +49,7 @@ export const getUserByUUID = async (req, res) => {
 }
 
 // POST: creation of new users
-export const postUser = async (req, res) => {
+const postUser = async (req, res) => {
     const user = req.body.user;
     // ensure all details provided
     if (!user || !user.username || !user.password || !user.email || !user.address_list) {
@@ -81,7 +81,7 @@ export const postUser = async (req, res) => {
     }
 }
 
-export const patchUser = async (req, res) => {
+const patchUser = async (req, res) => {
     const user = req.body.user;
     const decodedToken = req.decoded;
 
@@ -110,7 +110,7 @@ export const patchUser = async (req, res) => {
     }
 }
 
-export const deleteUser = (req, res) => {
+const deleteUser = (req, res) => {
     const decodedToken = req.decoded;
     
     if (!decodedToken.uuid) {
@@ -133,4 +133,4 @@ export const deleteUser = (req, res) => {
     }
 }
 
-export default {getUserByUUID, getUserByUsername, postUser, patchUser, deleteUser}; 
+module.exports =  { getUserByUUID, getUserByUsername, postUser, patchUser, deleteUser }; 

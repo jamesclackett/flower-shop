@@ -1,11 +1,10 @@
-import { dotenv } from 'dotenv';
-import { verify } from 'jsonwebtoken';
-dotenv.config();
+const { verify } = require('jsonwebtoken');
+require('dotenv').config();
 
 const env = process.env;
 
 // verify token and ensure it has user privileges
-export const validateUserToken = (req, res, next) => {
+const validateUserToken = (req, res, next) => {
     console.log("validating user token");
     const token = req.headers.authorization;
     if (token) {
@@ -35,3 +34,5 @@ const validateTokenPermission = (decodedToken, privilege) => {
     } 
     else return false;
 }
+
+module.exports = { validateUserToken }

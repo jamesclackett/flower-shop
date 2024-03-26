@@ -1,12 +1,13 @@
-import express, { json } from 'express';
+const express = require('express');
+const cors = require('cors');
+
 const app = express();
-const port = 8000;
-import cors from 'cors';
+const port = 8003;
 
 app.use(cors());
-app.use(json())
+app.use(express.json())
 
-import {getProduct, getProducts} from './product-service';
+const { getProduct, getProducts } = require('./product-service');
 
 //// Product API:
 app.get('/products', getProducts);

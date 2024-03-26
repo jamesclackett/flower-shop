@@ -1,21 +1,20 @@
-import { dotenv } from "dotenv";
-import { axios } from "axios";
-import queryDatabase from "../utils/database/query-database";
-import { encryptPassword, validatePassword } from "../utils/authentication/passwordAuth";
-import { generateUserJWT, generateServiceJWT } from "../utils/authorization/tokenAuth";
-dotenv.config();
+const axios = require('axios');
+const queryDatabase = require('../utils/database/query-database');
+const { encryptPassword, validatePassword } = require('../utils/authentication/passwordAuth');
+const { generateUserJWT, generateServiceJWT } = require('../utils/authorization/tokenAuth');
+require('dotenv').config();
 
 const env = process.env;
 
 // Sends public key to requester
-export const getPublicKey = (req, res) => {
+const getPublicKey = (req, res) => {
     // add encryption or verification of public key in future.
     const publicKey = env.PUBLIC_KEY;
     return res.status(200).send(publicKey);
 }
 
 // Encrypts users info and sends to user service
-export const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
     const userPayload = req.body.user;
     console.log("creating user: ", userPayload.username);
 
@@ -55,7 +54,7 @@ const storeUserCredentials = (username, password) => {
 }
 
 // Searches for requested user and compares provided credentials with actual
-export const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
     const userPayload = req.body.user;
     // ensure credentials provided
     if (!userPayload.username || !userPayload.password) {
@@ -89,3 +88,5 @@ export const loginUser = async (req, res) => {
         return res.status(500).json({"error logging in" : error});
     }
 }
+
+module.exports = {getPublicKey, loginUser, registerUser}

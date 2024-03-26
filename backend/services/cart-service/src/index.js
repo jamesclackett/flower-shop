@@ -1,14 +1,14 @@
-import express, { json } from 'express';
-import cors from 'cors';
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const port = 8000;
+const port = 8001;
 
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
-import * as cartService from './cart-service';
-import { validateUserToken } from '../utils/authorization/verifications';
+const cartService = require('./cart-service');
+const { validateUserToken } = require('../utils/authorization/verifications');
 
 //// Cart API:
 app.get('/cart/items', validateUserToken, cartService.getCartItems);

@@ -1,13 +1,13 @@
-import express, { json } from 'express';
+const express = require('express');
+const cors = require('cors');
 const app = express();
-const port = 8000;
-import cors from 'cors';
+const port = 8004;
 
 app.use(cors());
-app.use(json())
+app.use(express.json())
 
-import * as userService from './user-service';
-import { validateUserToken, validateServiceToken } from '../utils/authorization/verifications' 
+const userService = require('./user-service');
+const { validateUserToken, validateServiceToken } = require('../utils/authorization/verifications'); 
 
 //// User API (use by auth service):
 app.post('/user', validateServiceToken, userService.postUser);
