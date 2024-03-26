@@ -6,9 +6,9 @@ dotenv.config();
 const env = process.env;
 
 // generates a JWT for user with basic privileges for a given exp time
-export const generateJWT = async (username, expireIn) => {
+export const generateUserJWT = async (username, expireIn) => {
     const tokenPayload = {
-        "sub": await getUserUUID(username),
+        "uuid": await getUserUUID(username),
         "username": username,
         "role": "user",
         "iss" : "auth-service"
@@ -16,8 +16,23 @@ export const generateJWT = async (username, expireIn) => {
     return sign(tokenPayload, env.PRIVATE_KEY, {expiresIn: expireIn});
 }
 
+// generates a JWT for user with basic privileges for a given exp time
+export const generateServiceJWT = async (expireIn) => {
+    const tokenPayload = {
+        "sub": 'auth-service',
+        "role": "service",
+        "iss" : "auth-service"
+    }
+    return sign(tokenPayload, env.PRIVATE_KEY, {expiresIn: expireIn});
+}
+
 const getUserUUID = async (username) => {
-    const test = await axios.get(env.USER_API + username);
+    const axiosConfig = {
+        headers: {
+            'Authorization' : generateServiceJWT('1m')
+        }
+    }
+    const test = await axios.get(env.USER_API + username, axiosConfig);
     if (!test) throw new Error('user not found');
     return test;
 }

@@ -2,7 +2,7 @@ import { dotenv } from "dotenv";
 import { axios } from "axios";
 import queryDatabase from "../utils/database/query-database";
 import { encryptPassword, validatePassword } from "../utils/authentication/passwordAuth";
-import { generateJWT } from "../utils/authorization/tokenAuth";
+import { generateUserJWT, generateServiceJWT } from "../utils/authorization/tokenAuth";
 dotenv.config();
 
 const env = process.env;
@@ -32,7 +32,13 @@ export const registerUser = async (req, res) => {
     }
     try {
          // send user details to user service
-        const result = await axios.post(env.USER_API, {"user": userPayload});
+        const token = await generateServiceJWT('1m');
+        const axiosConfig = {
+            headers: {
+                'Authorization' : `${token}`
+            }
+        }
+        const result = await axios.post(env.USER_API, {"user": userPayload}, axiosConfig);
         // send user credentials to auth table
         if (result) storeUserCredentials(userPayload.username, userPayload.password);
         return res.status(201).json({"successfully created user": result});
@@ -72,7 +78,7 @@ export const loginUser = async (req, res) => {
     try {
         const isValid = await validatePassword(userPayload.password, storedPassword);
         if (isValid) {
-            const token = await generateJWT(userPayload.username, '5m');
+            const token = await generateUserJWT(userPayload.username, '5m');
             return res.status(200).json({jwtToken : token}); 
         } else {
             console.log("password validation failed for user", userPayload.username);
