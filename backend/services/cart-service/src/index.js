@@ -1,20 +1,21 @@
-const express = require('express');
+import express, { json } from 'express';
+import cors from 'cors';
+
 const app = express();
 const port = 8000;
-const cors = require('cors');
 
 app.use(cors());
-app.use(express.json())
+app.use(json());
 
-const cartService = require('./cart-service');
+import * as cartService from './cart-service';
+import { validateUserToken } from '../utils/authorization/verifications';
 
 //// Cart API:
-app.post('/cart/:userUUID', cartService.postCart)
-app.get('/cart/:userUUID/items', cartService.getCartItems);
-app.get('/cart/:userUUID/info', cartService.getCartInfo)
-app.post('/cart/:userUUID/item/:cartUUID', cartService.postCartItem)
-app.patch('/cart/:cartUUID/item/:itemUUID', cartService.patchCartItem)
-app.delete('/cart/:cartUUID/item/:itemUUID', cartService.deleteCartItem)
+app.get('/cart/items', validateUserToken, cartService.getCartItems);
+app.get('/cart/info', validateUserToken, cartService.getCartInfo);
+app.post('/cart/item', validateUserToken, cartService.postCartItem);
+app.patch('/cart/item/:itemUUID', validateUserToken, cartService.patchCartItem);
+app.delete('/cart/item/:itemUUID', validateUserToken, cartService.deleteCartItem);
 
 
 app.get('*', (req, res) => res.status(404).send());

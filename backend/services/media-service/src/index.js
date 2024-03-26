@@ -1,14 +1,14 @@
-const express = require('express');
+import express, { json } from 'express';
 const app = express();
 const port = 8000;
-const cors = require('cors');
-const mediaService = require('./media-service');
+import cors from 'cors';
+import { getImage } from '../src/media-service';
 
 app.use(cors());
-app.use(express.json())
+app.use(json())
 
 
-app.get('/media/image/:imageName', mediaService.getImage);
+app.get('/media/image/:imageName', getImage);
 
 
 app.get('*', (req, res) => res.status(404).send());

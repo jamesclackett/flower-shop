@@ -1,14 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+import { access, constants } from 'fs';
+import { join } from 'path';
 
-const getImage = (req, res) => {
+export const getImage = (req, res) => {
     const imageName = req.params.imageName;
-    const imagePath = path.join(__dirname, 'images', imageName);
+    const imagePath = join(__dirname, 'res/images', imageName);
 
-    fs.access(imagePath, fs.constants.F_OK, (error) => {
+    access(imagePath, constants.F_OK, (error) => {
         if (error) return res.status(404).send('image not found');
         return res.sendFile(imagePath);
     }) 
 }
-
-module.exports = {getImage};

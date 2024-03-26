@@ -21,21 +21,3 @@ const getUserUUID = async (username) => {
     if (!test) throw new Error('user not found');
     return test;
 }
-
-// FOR USE IN OTHER SERVICES, SAVE FOR LATER
-// export const validateToken = (token) => {
-//     console.log("checking token..");
-
-//     if (!token) {
-//         console.log('no token provided');
-//         return res.status(401).json({error: "unauthorized"});
-//     }
-//     try {
-//         verified = verify(token, env.PUBLIC_KEY);
-//         console.log('token validated!')
-//         return verified;
-//     } catch (error) {
-//         console.log('token not validated');
-//         return error;
-//     }
-// }

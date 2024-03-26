@@ -11,34 +11,40 @@ export const getUserByUsername = async (req, res) => {
     console.log("searching for user", username);
     try {
         const result = await queryDatabase(`SELECT * FROM "user" WHERE username ='${username}'`);
-        if (result.rows) {
+        if (result.rows.length > 0) {
             console.log("success - user found");
             return res.status(200).send(result.rows[0]);
-        }
+        } else {
+            console.log("user not found");
+            return res.status(404).json({"not found": "user not found"});
+        } 
     } catch (error) {
         console.log("error querying database for user: ", error);
-        return res.status(404).send(error);
+        return res.status(500).send(error);
     }
 }
 
 // search database for user of given uuuid
 export const getUserByUUID = async (req, res) => {
-    const uuid = req.params.userUUID;
+    const decodedToken = req.decoded;
 
-    if (!uuid) {
-        console.log("error - user uuid not provided in url");
-        return res.status(500).json({"error" : "uuid not provided"})
+    if (!decodedToken.uuid) {
+        console.log("error - user uuid not provided in token");
+        return res.status(500).json({"error" : "auth token missing claims"})
     }
-    console.log("searching for user", uuid);
+    console.log("searching for user", decodedToken.uuid);
     try {
-        const result = await queryDatabase(`SELECT * FROM "user" WHERE uuid ='${uuid}'`);
-        if (result.rows) {
+        const result = await queryDatabase(`SELECT * FROM "user" WHERE uuid ='${decodedToken.uuid}'`);
+        if (result.rows.length > 0) {
             console.log("success - user found");
             return res.status(200).send(result.rows[0]);
+        } else {
+            console.log("user not found");
+            return res.status(404).json({"not found" : "user not found"});
         }
     } catch (error) {
         console.log("error querying database for user: ", error);
-        return res.status(404).send(error);
+        return res.status(500).send(error);
     }
 }
 
@@ -77,10 +83,11 @@ export const postUser = async (req, res) => {
 
 export const patchUser = async (req, res) => {
     const user = req.body.user;
+    const decodedToken = req.decoded;
 
-    if (user.uuid != req.params.userUUID) {
-        console.log("error - provided mismatching uuid's in body and url");
-        return res.status(500).json({"error": "body and url uuid's do not match"});
+    if (!decodedToken.uuid || user.uuid != decodedToken.uuid) {
+        console.log("error - provided mismatching uuid's in body and token");
+        return res.status(500).json({"error": "uuid mismatch"});
     }
     console.log("received user update request");
 
@@ -104,14 +111,15 @@ export const patchUser = async (req, res) => {
 }
 
 export const deleteUser = (req, res) => {
-    const uuid = req.params.uuid;
-    if (!uuid) {
-        console.log("error - uuid not defined");
-        return res.status(500).json({"error" : "uuid not receieved"});
+    const decodedToken = req.decoded;
+    
+    if (!decodedToken.uuid) {
+        console.log("error - uuid not provided in auth token");
+        return res.status(500).json({"error" : "auth token missing claims"});
     }
     // delete user from database
     try {
-        const result = queryDatabase(`DELETE FROM "user" WHERE uuid = '${uuid}'`);
+        const result = queryDatabase(`DELETE FROM "user" WHERE uuid = '${decodedToken.uuid}'`);
         if (result) {
             console.log("success - deleted user");
             return res.status(204).json({"success" : "deleted user"});

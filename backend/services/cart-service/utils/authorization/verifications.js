@@ -17,22 +17,6 @@ export const validateUserToken = (req, res, next) => {
     return res.status(401).json({"error" : "unauthorized"});
 }
 
-// verify token and ensure it has service privileges
-export const validateServiceToken = (req, res, next) => {
-    // for now, always valid:
-    next();
-
-    // console.log("validating service token");
-    // const token = req.headers.authorization;
-    // if (token) {
-    //     const decoded = verify(token, env.PUBLIC_KEY);
-    //     req.decoded = decoded;
-    //     validateTokenPermission(decoded, 'service') ? next() : null;
-    // }
-    // console.log("service token validation failed");
-    // return res.status(401).json({"error" : "unauthorized"});
-};
-
 // check the tokens system priviledges
 const validateTokenPermission = (decodedToken, privilege) => {
 

@@ -1,18 +1,16 @@
-const express = require('express');
+import express, { json } from 'express';
 const app = express();
 const port = 8000;
-const cors = require('cors');
+import cors from 'cors';
 
 app.use(cors());
-app.use(express.json())
+app.use(json())
 
-const productService = require('./product-service');
+import {getProduct, getProducts} from './product-service';
 
 //// Product API:
-app.get('/products', productService.getProducts);
-app.get('/product/:productUUID', productService.getProduct);
-app.patch('/product/:productUUID', productService.updateProduct);
-app.delete('/product/:productUUID', productService.deleteProduct);
+app.get('/products', getProducts);
+app.get('/product/:productUUID', getProduct);
 
 
 app.get('*', (req, res) => res.status(404).send());
