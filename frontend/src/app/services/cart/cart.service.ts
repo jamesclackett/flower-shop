@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy, inject, signal } from '@angular/core';
 import { TProduct } from '../product/product.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { UserService } from '../user/user.service';
-import { API_URL_USER, HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
+import { HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST, API_CART_ITEM, API_CART_ITEMS, API_CART_INFO, CART_API } from '../../shared/constants';
 
 export type TCartItem = {
     uuid?: string,
@@ -28,16 +28,10 @@ export type TCartItemList = TCartItem[];
 @Injectable({
   providedIn: 'root'
 })
-export class CartService implements OnDestroy {
-    private userService: UserService = inject(UserService);
+export class CartService {
     private httpClient: HttpClient = inject(HttpClient);
-    private apiSubscription: Subscription = new Subscription;
     cartItems = signal<TCartItemList | undefined>(undefined);
     cartUUID : string | undefined;
-
-    ngOnDestroy(): void {
-        this.apiSubscription.unsubscribe();
-    }
 
     addProductToCart(product: TProduct): void {
         if (this.cartUUID) {
@@ -86,54 +80,33 @@ export class CartService implements OnDestroy {
     }
 
     updateCartItem(cartItem: TCartItem): void {
-        if(this.userService.isLoggedIn()) {
-            const URL =
-             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}/${cartItem.uuid}`;
-
-             this.queryAPI(HTTP_PATCH, URL, () => this.getCartItems(), {"cartItem" : cartItem});
-        }
+        const URL = `${API_CART_ITEM}${cartItem.uuid}`;
+        this.queryAPI(HTTP_PATCH, URL, () => this.getCartItems(), {"cartItem" : cartItem});
     }
 
     postCartItem(cartItem: TCartItem): void {
-        if(this.userService.isLoggedIn()) {
-            const URL =
-             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}`;
-
-            this.queryAPI(HTTP_POST, URL, () => this.getCartItems(), {"cartItem" : cartItem})
-        }
+        this.queryAPI(HTTP_POST, API_CART_ITEM, () => this.getCartItems(), {"cartItem" : cartItem});
     }
 
     getCartId(): void {
-        if (this.userService.isLoggedIn()) {
-            const URL = `${API_URL_USER}${this.userService.getUserUUID()}/cart/info`;
-
-            const callback = (cartInfo: TCartInfo) => {
-                if (cartInfo) this.cartUUID = cartInfo.uuid;
-            }
-            this.queryAPI(HTTP_GET, URL, callback);
+        const callback = (cartInfo: TCartInfo) => {
+            if (cartInfo) this.cartUUID = cartInfo.uuid;
         }
+        this.queryAPI(HTTP_GET, API_CART_INFO, callback);
     }
 
     getCartItems(): void {
-        if (this.userService.isLoggedIn()) {
-            const URL = `${API_URL_USER}${this.userService.getUserUUID()}/cart`;
-
-            const callback = (cartItems: TCartItemList) => {
-                if (cartItems && cartItems.length > 0) {
-                    this.cartItems.set(cartItems);
-                } else this.cartItems.set(undefined);
-            }
-            this.queryAPI(HTTP_GET, URL, callback);
+        const callback = (cartItems: TCartItemList) => {
+            if (cartItems && cartItems.length > 0) {
+                this.cartItems.set(cartItems);
+            } else this.cartItems.set(undefined);
         }
+        this.queryAPI(HTTP_GET, API_CART_ITEMS, callback);
     }
 
     deleteCartItem(cartItem: TCartItem): void {
-        if(this.userService.isLoggedIn()) {
-            const URL =
-             `${API_URL_USER}${this.userService.getUserUUID()}/cart/${cartItem.cart_uuid}/${cartItem.uuid}`
-
-            this.queryAPI(HTTP_DELETE, URL, () => this.getCartItems());
-        }
+        const URL = `${API_CART_ITEM}${cartItem.uuid}`
+        this.queryAPI(HTTP_DELETE, URL, () => this.getCartItems());
     }
 
     computeTotalPrice(): number {
@@ -154,16 +127,16 @@ export class CartService implements OnDestroy {
     queryAPI<T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void), payload?: any ): void {
         switch(requestType) {
             case HTTP_GET:
-                this.apiSubscription = this.httpClient.get<T>(URL).subscribe(callback);
+                this.httpClient.get<T>(URL).subscribe(callback);
                 break;
             case HTTP_POST: 
-                this.apiSubscription = this.httpClient.post<T>(URL, payload).subscribe(callback);
+                this.httpClient.post<T>(URL, payload).subscribe(callback);
                 break;
             case HTTP_PATCH: 
-                this.apiSubscription = this.httpClient.patch<T>(URL, payload).subscribe(callback);
+                this.httpClient.patch<T>(URL, payload).subscribe(callback);
             break;
             case HTTP_DELETE:
-                this.apiSubscription =  this.httpClient.delete<T>(URL).subscribe(callback);
+                this.httpClient.delete<T>(URL).subscribe(callback);
                 break;
             default: 
                 console.log("error: unkown request type")

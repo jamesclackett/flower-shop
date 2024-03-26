@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, Signal, WritableSignal, inject} from '@angular/core';
 import { ProductService, TProduct } from '../../services/product/product.service';
 import { CartService } from '../../services/cart/cart.service';
-import { API_URL_IMAGE } from '../../shared/constants';
+import { API_IMAGE } from '../../shared/constants';
 import { UserService } from '../../services/user/user.service';
 
 
@@ -20,7 +20,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     private cartService: CartService = inject(CartService);
     private userService: UserService= inject(UserService);
     
-    imageURL: string = API_URL_IMAGE;
+    imageURL: string = API_IMAGE;
     product: WritableSignal<TProduct | undefined> = this.productService.product;
 
     ngOnInit(): void { 

@@ -1,5 +1,5 @@
-import { Component, OnInit, WritableSignal, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, WritableSignal, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TUser, UserService } from '../../services/user/user.service';
 import { FormsModule } from '@angular/forms';
 
@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms';
 
 export class UserProfileComponent {
     userService: UserService = inject(UserService);
-    activatedRoute: ActivatedRoute = inject(ActivatedRoute);
     user: WritableSignal<TUser | undefined> = this.userService.user;
 
     onClickDeleteAddress(addressIndex: number) : void{

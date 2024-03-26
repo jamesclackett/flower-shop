@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy, WritableSignal, inject, signal } from '@angular/core';
-import { API_URL_USER } from '../../shared/constants';
+import { API_LOGIN, API_REGISTER, AUTH_API, USER_API } from '../../shared/constants';
 import { Observable, Subscription} from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -22,21 +22,16 @@ export type TUserRegisterForm = {
 @Injectable({
   providedIn: 'root'
 })
-export class UserService implements OnDestroy{
+export class UserService {
     private httpClient: HttpClient = inject(HttpClient);
     router: Router = inject(Router)
     user: WritableSignal<TUser | undefined> = signal<TUser | undefined> (undefined);
-    apiSubscription: Subscription = new Subscription;
-
-    ngOnDestroy() : void {
-        this.apiSubscription.unsubscribe();
-    }
 
     getUserUUID(): string | undefined{
         return this.user() ? this.user()?.uuid : undefined;
     }
 
-    isLoggedIn() : boolean {
+    isLoggedIn(): boolean {
         return this.user() ? true: false;
     }
 
@@ -45,22 +40,27 @@ export class UserService implements OnDestroy{
             username: username,
             password: password
         }
-
+        // Too much nesting?
         return new Observable<boolean>(observer => {
-            this.apiSubscription = 
-                this.httpClient.post<{user: TUser | undefined; jwtToken: string}>(API_URL_USER + 'login', {"user": userPayload}).subscribe({
-                next: (res) => {
-                    if (res.user) {
-                        this.user.set(res.user);
-                        localStorage.setItem('jwtToken', res.jwtToken);
-                        observer.next(true);
+            // request authentication token:
+            this.httpClient.post<{jwtToken: string}>(API_LOGIN, {"user": userPayload}).subscribe({
+                next: (response) => {
+                    if (response.jwtToken) {
+                        localStorage.setItem('jwtToken', response.jwtToken);
+                        // request user object:
+                        this.httpClient.get<TUser>(USER_API).subscribe((user) => {
+                            if (user) {
+                                this.user.set(user);
+                                observer.next(true);
+                            } else {
+                                observer.next(false);
+                            }
+                        })
                     } else {
-                        this.user.set(undefined);
                         observer.next(false);
                     }
                 },
                 error: (error: any) => {
-                    this.user.set(undefined);
                     observer.error(error)
                 },
                 complete: () => {observer.complete()}
@@ -72,8 +72,9 @@ export class UserService implements OnDestroy{
     logoutUser(): boolean {
         this.user.set(undefined);
         localStorage.removeItem('jwtToken');
-            if (localStorage.getItem('jwtToken')) return false;
-            if (!this.user() == undefined) return false;
+        // checks:
+        if (localStorage.getItem('jwtToken')) return false;
+        if (!this.user() == undefined) return false;
         return true;
     }
 
@@ -106,14 +107,13 @@ export class UserService implements OnDestroy{
     }
 
     updateUser(user: TUser): void {
-        const URL = `${API_URL_USER}${user.uuid}`
-            this.apiSubscription = this.httpClient.patch(URL, {"user" : user}).subscribe(
-                () => {this.user.set(user)}
-            )
+        const URL = `${USER_API}${user.uuid}`
+        this.httpClient.patch<TUser>(URL, {"user" : user}).subscribe(
+            () => {this.user.set(user)}
+        );
     }
 
     registerUser(form: TUserRegisterForm): void {
-
         const user: TUser = {
             uuid: '', 
             username: form.username, 
@@ -121,10 +121,10 @@ export class UserService implements OnDestroy{
             email: form.email,
             address_list: [form.address]
         }
-        this.apiSubscription = this.httpClient.post(API_URL_USER + 'register', {"user" : user}).subscribe({
+        this.httpClient.post(API_REGISTER, {"user" : user}).subscribe({
             next: () => { this.router.navigate(['/user/login']) },
             error: (error) => { console.log(error) }
-        })
+        });
     }
 
     

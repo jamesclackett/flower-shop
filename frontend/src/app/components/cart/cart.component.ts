@@ -1,6 +1,6 @@
 import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CartService, TCartItem, TCartItemList } from '../../services/cart/cart.service';
-import { API_URL_IMAGE } from '../../shared/constants';
+import { API_IMAGE } from '../../shared/constants';
 
 @Component({
   selector: 'app-cart',
@@ -12,7 +12,7 @@ import { API_URL_IMAGE } from '../../shared/constants';
 export class CartComponent  implements OnInit {
     cartService: CartService = inject(CartService);
     cartItems: Signal<TCartItemList | undefined> = this.cartService.cartItems;
-    imageURL: string = API_URL_IMAGE;
+    imageURL: string = API_IMAGE;
 
     ngOnInit(): void {
         this.cartService.cartItems.set(undefined);
