@@ -5,18 +5,21 @@ const getCartItems = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!decodedToken.uuid){
+        console.log("getCartItems | auth token is missing uuid");
         return res.status(500).json({error: "auth token missing claims"});
     }
     // search for cart in database
     try {
-        const cartUUID = await getCartUUID(decodedToken.uuid);
+        let cartUUID = await getCartUUID(decodedToken.uuid);
         // if cart doesnt exist, create one.
         if (!cartUUID) {
-            console.log("user doesnt seem to have a cart, creating one..");
+            console.log("getCartItems | user doesnt seem to have a cart, creating one..");
             const createdCart = await createCart(decodedToken.uuid);
             if (!createdCart) {
+                console.log("getCartItems | failed to create cart");
                 return res.status(500).json({"error" : "failed to create cart for user"});
-            } 
+            }
+            cartUUID = createdCart.uuid;
         }
 
         const sqlQuery = `
@@ -26,30 +29,41 @@ const getCartItems = async (req, res) => {
         WHERE cart_item.cart_uuid = '${cartUUID}'`;
 
         const result = await queryDatabase(sqlQuery);
+        if (result.rowCount > 0) {
+            console.log("getCartItems | retrieved cart items from database");
+        } else {
+            console.log("getCartItems | database query retrieved 0 cart items");
+        }
         return res.status(200).send(result.rows);
 
     } catch (error) {
-        return res.status(500).send(error);
+        console.log("getCartItems | failed to get cart items due to error", error.message);
+        return res.status(500).send(error.message);
     }
 }
 
 // Search for users' cart information in datatabase
 const getCartInfo = async (req, res) => {
+   
     const decodedToken = req.decoded;
 
     if (!decodedToken.uuid) {
+        console.log("getCartInfo | auth token missing uuid");
         return res.status(500).json({"error" : "auth token missing claims"});
     } 
     // search for cart using users uuid
     try {
-        const cartInfo = { uuid: await getCartUUID(decodedToken.uuid) };
-        if (!cartInfo) {
-            return res.status(404).json({"not found" : "cart no found"});
+        const cartUUID = await getCartUUID(decodedToken.uuid);
+        if (!cartUUID) {
+            console.log("getCartInfo | couldnt find cart info");
+            return res.status(404).json({"not found" : "cart info not found"});
         } else {
-            res.status(200).send(cartInfo);
+            console.log("getCartInfo | found cart info, sending.");
+            return res.status(200).send({uuid: cartUUID});
         }
     } catch (error) {
-        return res.status(500).send(error);
+        console.log("getCartInfo | error finding cart info", error.message);
+        return res.status(500).send(error.message);
     }
 
 }
@@ -59,9 +73,10 @@ const getCartUUID = async (userUUID) => {
     if (!userUUID) {
         throw new Error("user uuid not provided. cannot search database");
     }
-    console.log('cart requested for user', userUUID);
+    console.log('getCartUUID | cart uuid requested for user', userUUID);
     const result = await queryDatabase(`SELECT * FROM "cart" WHERE user_uuid = '${userUUID}'`);
     if (result.rowCount > 0) {
+        console.log('getCartUUID | cart uuid found for user', userUUID);
         return result.rows[0].uuid;
     }
 }
@@ -72,9 +87,11 @@ const deleteCartItem = async (req, res) => {
     const itemUUID = req.params.itemUUID;
 
     if (!decodedToken.uuid) {
+        console.log("deleteCartItem | auth token is missing uuid");
         return res.status(500).json({"error" : "auth token missing claims"});
     } 
     if (!itemUUID){
+        console.log("deleteCartItem | url is missing item uuid");
         return res.status(500).json({"error" : "no item uuid provided"});
     }
     try {
@@ -85,6 +102,7 @@ const deleteCartItem = async (req, res) => {
        
         if (searchRes.rowCount > 0) {
             if (searchRes.rows[0].cart_uuid != cartUUID){
+                console.log("deleteCartItem | not authorized to delete this");
                 return res.status(401).json({"failed" : "not authorized"});
             }
         }
@@ -93,18 +111,22 @@ const deleteCartItem = async (req, res) => {
         const result = await queryDatabase(sqlQuery);
 
         if (result.rowCount > 0) {
-            res.status(200).json({"success" : "cart item deleted"});
+            console.log("deleteCartItem | successfully deleted item");
+            return res.status(204).send();
         } else {
-            res.status(404).json({"failed" : "no cart items deleted"});
+            console.log("deleteCartItem | no cart items to delete");
+            return res.status(404).json({"failed" : "no cart items deleted"});
         }
     } catch (error) {
-        return res.status(500).send(error);
+        console.log("deleteCartItem | error while deleting cart item", error.message);
+        return res.status(500).send(error.message);
     }
 }
 
 // Creates a new cart for the user in the database
 const createCart = async (userUUID) => {
-    return await queryDatabase(`INSERT INTO "cart" (user_uuid) VALUES ('${userUUID}')`);
+    const response = await queryDatabase(`INSERT INTO "cart" (user_uuid) VALUES ('${userUUID}') RETURNING *`);
+    return response.rows[0];
 }
 
 // adds a new cart item to the user's cart.
@@ -113,15 +135,18 @@ const postCartItem = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!cartItem) {
+        console.log("postCartItem | cart item was not provided in body");
         return res.status(500).json({"error" : "cart item is missing from request"});
     }
     if (!decodedToken.uuid) {
+        console.log("postCartItem | auth token is missing uuid");
         return res.status(500).json({"error" : "auth token missing claims"});
     } 
 
     try {
         const cartUUID = await getCartUUID(decodedToken.uuid);
         if (cartUUID != cartItem.cart_uuid) {
+            console.log("postCartItem | not authorized to post this item, uuid mismatch");
             return res.status(401).json({"failed" : "not authorized"});
         }
 
@@ -129,12 +154,15 @@ const postCartItem = async (req, res) => {
 
         const result = await queryDatabase(sqlQuery);
         if (result.rowCount > 0) {
-            return res.status(201).json({"success" : "cart item created"});
+            console.log("postCartItem | successfully created cart item");
+            return res.status(204).send();
         } else {
+            console.log("postCartItem | cart item was not created");
             return res.status(404).json({"failed" : "cart item was not created"});
         }
     } catch (error) {
-        return res.status(500).send(error);
+        console.log("postCartItem | failed to create cart item due to error", error.message);
+        return res.status(500).send(error.message);
     }
 }
 
@@ -144,27 +172,33 @@ const patchCartItem = async (req, res) => {
     const decodedToken = req.decoded;
 
     if (!cartItem || cartItem.uuid != req.params.itemUUID) {
-        res.status(500).json({"error" : "uuid mismatch"});
-        return;
+        console.log("patchCartItem | cart item body and params mismatch");
+        return res.status(500).json({"error" : "uuid mismatch"});
     }
     if (!decodedToken.uuid) {
+        console.log("patchCartItem | auth token is missing uuid");
         return res.status(500).json({"error" : "auth token missing claims"});
     } 
     try {
         // ensure that only the cart for token user can be updated 
         const cartUUID = await getCartUUID(decodedToken.uuid);
-        if (cartUUID != cartItem.cartUUID) {
+        console.log(cartUUID, cartItem.cart_uuid);
+        if (cartUUID != cartItem.cart_uuid) {
+            console.log("patchCartItem | not authorized to update this cart");
             return res.status(401).json({"failed" : "not authorized"});
         }
         const sqlQuery = `UPDATE "cart_item" SET quantity = ${cartItem.quantity} WHERE uuid = '${cartItem.uuid}'`;
         const result = await queryDatabase(sqlQuery);
         if (result.rowCount > 0) {
-            return res.status(200).json({"success" : ""});
+            console.log("patchCartItem | successfully updated cart items");
+            return res.status(204).send();
         } else {
+            console.log("patchCartItem | no cart items were updated");
             return res.status(404).json({"failed" : "no cart items updated"});
         }  
     } catch (error) {
-        return res.status(500).send(error);
+        console.log("patchCartItem | error when updating cart item", error.message);
+        return res.status(500).send(error.message);
     }
 
 }

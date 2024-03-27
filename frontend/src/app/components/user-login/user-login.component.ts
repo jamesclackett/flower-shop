@@ -38,7 +38,11 @@ export class UserLoginComponent implements OnInit, OnDestroy {
         const didLogin$ = this.userService.loginUser(username, password);
         this.loginSubscription = didLogin$.subscribe({
             next: (success) => {
-                this.router.navigate(['/user/', this.userService.getUserUUID()]);
+                if (success) {
+                    this.router.navigate(['/user/', this.userService.getUserUUID()]);
+                } else {
+                    console.log("user was not logged in");
+                }
             },
             error: (error) => {
                 console.log("error logging in: ", error);

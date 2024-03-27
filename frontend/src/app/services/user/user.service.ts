@@ -47,23 +47,18 @@ export class UserService {
                 next: (response) => {
                     if (response.jwtToken) {
                         localStorage.setItem('jwtToken', response.jwtToken);
-                        // request user object:
+                        // get user object now that authorization is complete
                         this.httpClient.get<TUser>(USER_API).subscribe((user) => {
-                            if (user) {
-                                this.user.set(user);
-                                observer.next(true);
-                            } else {
-                                observer.next(false);
-                            }
-                        })
+                            this.user.set(user);
+                            observer.next(true);
+                        });    
                     } else {
                         observer.next(false);
                     }
                 },
                 error: (error: any) => {
-                    observer.error(error)
-                },
-                complete: () => {observer.complete()}
+                    observer.error(error);
+                }
             });
         })
         
@@ -107,10 +102,10 @@ export class UserService {
     }
 
     updateUser(user: TUser): void {
-        const URL = `${USER_API}${user.uuid}`
-        this.httpClient.patch<TUser>(URL, {"user" : user}).subscribe(
-            () => {this.user.set(user)}
-        );
+        this.httpClient.patch<TUser>(USER_API, {"user" : user}).subscribe({
+            next: (user) => { this.user.set(user) },
+            error: (error) => { console.log(error) }
+        });
     }
 
     registerUser(form: TUserRegisterForm): void {

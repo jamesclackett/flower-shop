@@ -1,31 +1,58 @@
 services:
-
   auth-service:
     build: ./services/auth-service
     volumes:
       - ./services/auth-service:/app
-    network_mode: host
+    environment:
+      USER_API: http://user-service:8000/user/
+      DB_HOST: database-service
+    ports:
+      - 8000:8000
 
   cart-service:
     build: ./services/cart-service
     volumes:
       - ./services/cart-service:/app
-    network_mode: host
+    environment:
+      DB_HOST: database-service
+    ports:
+      - 8001:8001
 
   media-service:
     build: ./services/media-service
     volumes:
       - ./services/media-service:/app
-    network_mode: host
+    ports:
+      - 8002:8002
 
   product-service:
     build: ./services/product-service
     volumes:
       - ./services/product-service:/app
-    network_mode: host
+    environment:
+      DB_HOST: database-service
+    ports:
+      - 8003:8003
 
   user-service:
     build: ./services/user-service
     volumes:
       - ./services/user-service:/app
-    network_mode: host
+    environment:
+      AUTH_API: http://auth-service:8000/
+      DB_HOST: database-service
+    ports:
+      - 8004:8004
+
+  database-service:
+      build: ./services/database-service
+      volumes:
+        - ./services/database-service/db_data:/var/lib/postgresql/data
+      env_file:
+        - ./services/database-service/.env
+      ports:
+        - 5432:5432
+
+networks:
+  flower-network:
+    driver: bridge

@@ -1,5 +1,4 @@
 const { verify } = require('jsonwebtoken');
-require('dotenv').config();
 
 const env = process.env;
 
@@ -7,30 +6,38 @@ const env = process.env;
 const validateUserToken = (req, res, next) => {
     console.log("validating user token");
     const token = req.headers.authorization;
-    if (token) {
-        try {
-            const decoded = verify(token, env.PUBLIC_KEY);
-            req.decoded = decoded;
-            validateTokenPermission(decoded, 'user') ? next() : null;
-        } catch (error) {
-            res.status(401).json({"error" : "unauthorized"});
-        }
+
+    if (!token) {
+        console.log("user token validation failed - no token provided");
+        return res.status(401).json({"error" : "unauthorized"});
     }
-    console.log("user token validation failed");
-    return res.status(401).json({"error" : "unauthorized"});
+    try {
+        const decoded = verify(token, env.PRIVATE_KEY);
+        req.decoded = decoded;
+        if (validateTokenPermission(decoded, 'user')) {
+            console.log("user token verified, permissions match")
+            next();
+        } else {
+            console.log("invalid permissions for user token");
+            return res.status(401).json({"error" : "unauthorized"});
+        }
+    } catch (error) {
+        console.log("user token validation failed - token couldnt be decoded", error.message);
+        return res.status(401).json({"error" : "unauthorized"});
+    }
 }
 
 // check the tokens system priviledges
 const validateTokenPermission = (decodedToken, privilege) => {
 
     if (privilege == 'user') {
-        decodedToken.role === 'user' ? true : false;
+        return decodedToken.role === 'user' ? true : false;
     }
     if (privilege == 'admin') {
-        decodedToken.role === 'admin' ? true : false;
+        return decodedToken.role === 'admin' ? true : false;
     } 
     if (privilege == 'service') {
-        decodedToken.role === 'service' ? true : false;
+        return decodedToken.role === 'service' ? true : false;
     } 
     else return false;
 }

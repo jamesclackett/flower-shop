@@ -1,9 +1,7 @@
-import { Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { TProduct } from '../product/product.service';
 import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { UserService } from '../user/user.service';
-import { HTTP_GET, HTTP_DELETE, HTTP_PATCH, HTTP_POST, API_CART_ITEM, API_CART_ITEMS, API_CART_INFO, CART_API } from '../../shared/constants';
+import { API_CART_INFO, API_CART_ITEM, API_CART_ITEMS, HTTP_DELETE, HTTP_GET, HTTP_PATCH, HTTP_POST } from '../../shared/constants';
 
 export type TCartItem = {
     uuid?: string,
@@ -81,32 +79,68 @@ export class CartService {
 
     updateCartItem(cartItem: TCartItem): void {
         const URL = `${API_CART_ITEM}${cartItem.uuid}`;
-        this.queryAPI(HTTP_PATCH, URL, () => this.getCartItems(), {"cartItem" : cartItem});
+
+        const callback = {
+            next: () => {
+                this.getCartItems();
+            },
+            error: (error: any) => {
+                console.log(error);
+            }
+        }
+        this.queryAPI(HTTP_PATCH, URL, callback, {"cartItem" : cartItem});
     }
 
     postCartItem(cartItem: TCartItem): void {
-        this.queryAPI(HTTP_POST, API_CART_ITEM, () => this.getCartItems(), {"cartItem" : cartItem});
+        const callback = {
+            next: () => {
+                this.getCartItems();
+                console.log("added product to cart");
+            },
+            error: (error: any) => {
+                console.log(error);
+            }
+        }
+
+        this.queryAPI(HTTP_POST, API_CART_ITEM, callback, {"cartItem" : cartItem});
     }
 
     getCartId(): void {
-        const callback = (cartInfo: TCartInfo) => {
-            if (cartInfo) this.cartUUID = cartInfo.uuid;
-        }
-        this.queryAPI(HTTP_GET, API_CART_INFO, callback);
+        const callback = {
+            next: (cartInfo: TCartInfo) => {
+                this.cartUUID = cartInfo?.uuid;
+            },
+            error: (error: any) => {
+                console.log(error);
+            }
+        };
+        this.queryAPI<TCartInfo>(HTTP_GET, API_CART_INFO, callback);
     }
 
     getCartItems(): void {
-        const callback = (cartItems: TCartItemList) => {
-            if (cartItems && cartItems.length > 0) {
-                this.cartItems.set(cartItems);
-            } else this.cartItems.set(undefined);
-        }
-        this.queryAPI(HTTP_GET, API_CART_ITEMS, callback);
+        const callback = {
+            next: (cartItems: TCartItemList) => {
+                this.cartItems.set(cartItems.length > 0 ? cartItems : undefined);
+            },
+            error: (error: any) => {
+                console.log(error);
+            },
+        };
+        this.queryAPI<TCartItemList>(HTTP_GET, API_CART_ITEMS, callback);
     }
 
     deleteCartItem(cartItem: TCartItem): void {
         const URL = `${API_CART_ITEM}${cartItem.uuid}`
-        this.queryAPI(HTTP_DELETE, URL, () => this.getCartItems());
+
+        const callback = {
+            next: () => {
+                this.getCartItems();
+            },
+            error: (error: any) => {
+                console.log(error);
+            }
+        }
+        this.queryAPI(HTTP_DELETE, URL, callback);
     }
 
     computeTotalPrice(): number {
@@ -124,7 +158,7 @@ export class CartService {
     }
 
 
-    queryAPI<T>(requestType: number, URL: string, callback?: (() => void) | ((arg: T) => void), payload?: any ): void {
+    queryAPI<T>(requestType: number, URL: string, callback: {next: (res: T) => void, error: (error: any) => void}, payload?: any ): void {
         switch(requestType) {
             case HTTP_GET:
                 this.httpClient.get<T>(URL).subscribe(callback);

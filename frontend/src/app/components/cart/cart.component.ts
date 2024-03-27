@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, Signal, inject } from '@angular/core';
 import { CartService, TCartItem, TCartItemList } from '../../services/cart/cart.service';
 import { API_IMAGE } from '../../shared/constants';
 

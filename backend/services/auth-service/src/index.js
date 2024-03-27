@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config({path: '../.env'});
 const { getPublicKey, loginUser, registerUser } = require('./auth-service');
 
 const app = express();

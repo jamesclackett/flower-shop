@@ -1,6 +1,5 @@
 const { sign } = require('jsonwebtoken');
 const axios = require('axios');
-require('dotenv').config();
 
 const env = process.env;
 
@@ -28,12 +27,12 @@ const generateServiceJWT = async (expireIn) => {
 const getUserUUID = async (username) => {
     const axiosConfig = {
         headers: {
-            'Authorization' : generateServiceJWT('1m')
+            'Authorization' : await generateServiceJWT('1m')
         }
     }
-    const test = await axios.get(env.USER_API + username, axiosConfig);
-    if (!test) throw new Error('user not found');
-    return test;
+    const response = await axios.get(env.USER_API + username, axiosConfig);
+    if (!response.data.uuid) throw new Error('user not found');
+    return response.data.uuid;
 }
 
 module.exports = { generateServiceJWT, generateUserJWT };
