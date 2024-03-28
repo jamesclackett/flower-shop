@@ -4,8 +4,10 @@ services:
     volumes:
       - ./services/auth-service:/app
     environment:
-      USER_API: http://user-service:8000/user/
+      USER_API: http://user-service:8004/user/
       DB_HOST: database-service
+    env_file:
+        - ./services/auth-service/.env
     ports:
       - 8000:8000
 
@@ -15,6 +17,8 @@ services:
       - ./services/cart-service:/app
     environment:
       DB_HOST: database-service
+    env_file:
+        - ./services/cart-service/.env
     ports:
       - 8001:8001
 
@@ -31,6 +35,8 @@ services:
       - ./services/product-service:/app
     environment:
       DB_HOST: database-service
+    env_file:
+        - ./services/product-service/.env
     ports:
       - 8003:8003
 
@@ -41,6 +47,8 @@ services:
     environment:
       AUTH_API: http://auth-service:8000/
       DB_HOST: database-service
+    env_file:
+        - ./services/user-service/.env
     ports:
       - 8004:8004
 

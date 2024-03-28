@@ -1,6 +1,6 @@
 const { sign } = require('jsonwebtoken');
 const axios = require('axios');
-
+const fs = require('fs');
 const env = process.env;
 
 // generates a JWT for user with basic privileges for a given exp time
@@ -11,7 +11,9 @@ const generateUserJWT = async (username, expireIn) => {
         "role": "user",
         "iss" : "auth-service"
     }
-    return sign(tokenPayload, env.PRIVATE_KEY, {expiresIn: expireIn});
+    const key = fs.readFileSync('./utils/keys/private_key.pem', {encoding: 'utf-8'});
+
+    return sign(tokenPayload, key, { algorithm: 'RS256', expiresIn: expireIn });
 }
 
 // generates a JWT for user with basic privileges for a given exp time
@@ -21,7 +23,12 @@ const generateServiceJWT = async (expireIn) => {
         "role": "service",
         "iss" : "auth-service"
     }
-    return sign(tokenPayload, env.PRIVATE_KEY, {expiresIn: expireIn});
+
+    const key = fs.readFileSync('./utils/keys/private_key.pem', {encoding: 'utf-8'});
+
+    return sign(tokenPayload, key, { algorithm: 'RS256', expiresIn: expireIn });
+
+    
 }
 
 const getUserUUID = async (username) => {

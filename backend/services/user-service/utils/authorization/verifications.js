@@ -1,6 +1,5 @@
 const { verify } = require('jsonwebtoken');;
-
-const env = process.env;
+const fs = require('fs');
 
 // verify token and ensure it has user privileges
 const validateUserToken = (req, res, next) => {
@@ -12,7 +11,9 @@ const validateUserToken = (req, res, next) => {
         return res.status(401).json({"error" : "unauthorized"});
     }
     try {
-        const decoded = verify(token, env.PRIVATE_KEY);
+        const key = fs.readFileSync('./utils/keys/public_key.pem', {encoding: 'utf-8'});
+
+        const decoded = verify(token, key);
         req.decoded = decoded;
         if (validateTokenPermission(decoded, 'user')) {
             console.log("validateUserToken | user token verified, permissions match")
@@ -37,7 +38,9 @@ const validateServiceToken = (req, res, next) => {
         return res.status(401).json({"error" : "unauthorized"});
     }
     try {
-        const decoded = verify(token, env.PRIVATE_KEY);
+        const key = fs.readFileSync('./utils/keys/public_key.pem', {encoding: 'utf-8'});
+
+        const decoded = verify(token, key, { algorithms: ['RS256'] });
         req.decoded = decoded;
         if (validateTokenPermission(decoded, 'service')) {
             console.log("validateServiceToken | service token verified, permissions match")
