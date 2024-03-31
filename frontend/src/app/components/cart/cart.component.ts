@@ -1,6 +1,9 @@
 import { Component, OnDestroy, OnInit, Signal, inject } from '@angular/core';
 import { CartService, TCartItem, TCartItemList } from '../../services/cart/cart.service';
 import { API_IMAGE } from '../../shared/constants';
+import { UserService } from '../../services/user/user.service';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -9,15 +12,29 @@ import { API_IMAGE } from '../../shared/constants';
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
-export class CartComponent  implements OnInit {
+export class CartComponent  implements OnInit, OnDestroy {
+    userService: UserService = inject(UserService);
     cartService: CartService = inject(CartService);
+    router: Router = inject(Router);
     cartItems: Signal<TCartItemList | undefined> = this.cartService.cartItems;
+    loggedInSubscription: Subscription = new Subscription;
     imageURL: string = API_IMAGE;
+
+    ngOnDestroy(): void {
+        this.loggedInSubscription.unsubscribe();
+    }
 
     ngOnInit(): void {
         this.cartService.cartItems.set(undefined);
-        this.cartService.getCartItems();
-        this.cartService.getCartId();
+        this.loggedInSubscription = this.userService.isLoggedIn().subscribe((isLoggedIn) => {
+            if (isLoggedIn) {
+                this.cartService.getCartItems();
+                this.cartService.getCartId();
+            } else {
+                this.router.navigate(['user/login']);
+            }
+        });
+        
     }
 
     onClickIncreaseItemQuantity(cartItem: TCartItem): void {

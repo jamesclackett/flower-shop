@@ -1,4 +1,5 @@
 const axios = require('axios');
+const fs = require('fs');
 const queryDatabase = require('../utils/database/query-database');
 const { encryptPassword, validatePassword } = require('../utils/authentication/passwordAuth');
 const { generateUserJWT, generateServiceJWT } = require('../utils/authorization/tokenAuth');
@@ -81,9 +82,10 @@ const loginUser = async (req, res) => {
     try {
         const isValid = await validatePassword(userPayload.password, storedPassword);
         if (isValid) {
-            const token = await generateUserJWT(userPayload.username, '5m');
+            const userToken = await generateUserJWT(userPayload.username, '20m');
+            // const userRefreshToken = await generateUserJWT(userPayload.username, '30m');
             console.log("loginUser | user verified, sending auth token.")
-            return res.status(200).json({jwtToken : token}); 
+            return res.status(200).json({jwtToken : userToken}); 
         } else {
             console.log("loginUser | password validation failed for user", userPayload.username);
             return res.status(401).json({"failed": "password validation failed"});

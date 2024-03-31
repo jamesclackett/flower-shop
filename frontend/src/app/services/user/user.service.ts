@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, OnDestroy, WritableSignal, inject, signal } from '@angular/core';
+import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { API_LOGIN, API_REGISTER, AUTH_API, USER_API } from '../../shared/constants';
-import { Observable, Subscription} from 'rxjs';
+import { Observable, of} from 'rxjs';
 import { Router } from '@angular/router';
 
 export type TUser = {
@@ -27,13 +27,76 @@ export class UserService {
     router: Router = inject(Router)
     user: WritableSignal<TUser | undefined> = signal<TUser | undefined> (undefined);
 
+    constructor() {
+        this.isLoggedIn().subscribe((isLoggedIn) => {
+            if (isLoggedIn) {
+                this.getUser().subscribe();
+            } else {
+                this.router.navigate(['user/login']);
+            }
+        })
+    }
+
     getUserUUID(): string | undefined{
         return this.user() ? this.user()?.uuid : undefined;
     }
 
-    isLoggedIn(): boolean {
-        return this.user() ? true: false;
+    getUser(): Observable<boolean> {
+        return new Observable<boolean>(observer => {
+            this.httpClient.get<TUser>(USER_API).subscribe({
+                next: (user) => {
+                    if (user) {
+                        this.user.set(user);
+                        observer.next(true);
+                    } else {
+                        this.user.set(undefined);
+                        observer.next(false);  
+                    }
+                },
+                error: (error) => {
+                    console.log(error);
+                    observer.next(error);
+                }
+            }) 
+        })
     }
+
+    isLoggedIn(): Observable<boolean> {
+        //is there a token and is it still valid:
+        const token = localStorage.getItem('jwtToken');
+        if (!token) return of(false);
+        return this.isTokenValid();
+    }
+
+    isTokenValid(): Observable<boolean> {
+        return new Observable<boolean>(observer => {
+            this.httpClient.get<{isValid: boolean}>(AUTH_API + 'token/verify').subscribe({
+                next: (res) => {
+                    observer.next(true);
+                },
+                error: (error) => {
+                    observer.next(false)
+                }
+            })
+        })      
+    }
+
+    // refreshToken(): Observable<boolean> {
+    //     return new Observable<boolean>((observer) => {
+    //         this.httpClient.get<{jwtToken: string}>(AUTH_API + 'token/refresh').subscribe({
+    //             next: (res) => {
+    //                 if (res.jwtToken) {
+    //                     localStorage.setItem('jwtToken', res.jwtToken);
+    //                     observer.next(true);
+    //                 } else observer.next(false);  
+    //             },
+    //             error: (error) => {
+    //                 console.log(error)
+    //                 observer.error(error);
+    //             }
+    //         })
+    //     });
+    // }
 
     loginUser(username: string, password: string): Observable<boolean> {
         const userPayload = {
@@ -48,10 +111,12 @@ export class UserService {
                     if (response.jwtToken) {
                         localStorage.setItem('jwtToken', response.jwtToken);
                         // get user object now that authorization is complete
-                        this.httpClient.get<TUser>(USER_API).subscribe((user) => {
-                            this.user.set(user);
-                            observer.next(true);
-                        });    
+                        this.getUser().subscribe({
+                            next: (success) => {
+                                observer.next(success);
+                            },
+                            error: (error) => observer.error(error)
+                        });
                     } else {
                         observer.next(false);
                     }
@@ -67,8 +132,10 @@ export class UserService {
     logoutUser(): boolean {
         this.user.set(undefined);
         localStorage.removeItem('jwtToken');
+        sessionStorage.removeItem('jwtRefreshToken');
         // checks:
         if (localStorage.getItem('jwtToken')) return false;
+        if (sessionStorage.getItem('jwtRefreshToken')) return false;
         if (!this.user() == undefined) return false;
         return true;
     }
@@ -121,6 +188,5 @@ export class UserService {
             error: (error) => { console.log(error) }
         });
     }
-
     
 }

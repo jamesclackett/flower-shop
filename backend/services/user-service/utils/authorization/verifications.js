@@ -23,7 +23,7 @@ const validateUserToken = (req, res, next) => {
             return res.status(401).json({"error" : "unauthorized"});
         }
     } catch (error) {
-        console.log("validateUserToken | user token validation failed - token couldnt be decoded", error);
+        console.log("validateUserToken | user token validation failed - token couldnt be decoded", error.messge);
         return res.status(401).json({"error" : "unauthorized"});
     }
 }
